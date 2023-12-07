@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using DG.Tweening;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -10,11 +11,20 @@ public class PlayerManager : MonoBehaviour
 
     private Rigidbody rigidbody;
 
+    [Header("アニメーター"), SerializeField]
+    private Animator animator;
+
     [Header("移動速度"), SerializeField]
     private float moveSpeed;
 
-    [Header("移動速度"), SerializeField]
+    [Header("移動速度レート"), SerializeField]
     private float moveSpeedRate = 0.0f;
+
+    [Header("ローリング速度レート"), SerializeField]
+    private float rollingSpeedRate = 0.0f;
+
+    [Header("ローリング中"), SerializeField]
+    private bool isRolling = false;
 
     [Header("rayの長さ"), SerializeField]
     private float rayLength;
@@ -29,6 +39,8 @@ public class PlayerManager : MonoBehaviour
     {
         playerInput = new PlayerInputAction();
         rigidbody = GetComponent<Rigidbody>();
+
+        DG.Tweening.DOTween.SetTweensCapacity(tweenersCapacity: 200, sequencesCapacity: 500);
     }
 
     private void OnEnable()
@@ -41,16 +53,18 @@ public class PlayerManager : MonoBehaviour
         playerInput.Disable();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     // Update is called once per frame
     void Update()
     {
         GravityManager.instance.gravityUpdate(rigidbody);
+
+        //スティック入力取得
+        Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
+        if (inputValue.sqrMagnitude == 0.0f)
+        {
+            animator.SetBool("isIdle", true);
+            animator.SetBool("isWalk", false);
+        }
 
         //移動
         Move();
@@ -61,26 +75,46 @@ public class PlayerManager : MonoBehaviour
         //射撃
         Fire();
 
+        //ローリング
+        Rolling();
+
         //横移動かつジャンプ→ローリング
         //前後移動またはジャンプ単体→ジャンプ
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void Move()
     {
+        //スティック入力取得
         Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
 
-        Vector3 moveVelocity = new Vector3(
-            inputValue.x * moveSpeed * moveSpeedRate * Time.deltaTime,
-            0.0f,//ジャンプ
-            inputValue.y * moveSpeed * moveSpeedRate * Time.deltaTime);
 
-        transform.position += moveVelocity;
+        if (inputValue.sqrMagnitude != 0.0f)
+        {
+            animator.SetBool("isWalk", true);
+            animator.SetBool("isIdle", false);
+
+            //プレイヤー移動
+            Vector3 moveVelocity = new Vector3(
+                inputValue.x * moveSpeed * moveSpeedRate * rollingSpeedRate * inputValue.magnitude * Time.deltaTime,
+                0.0f,//ジャンプ
+                inputValue.y * moveSpeed * moveSpeedRate * rollingSpeedRate * inputValue.magnitude * Time.deltaTime);
+
+            transform.position += moveVelocity;
+        }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void Fire()
     {
+        //射撃インターバル
         fireInterval++;
 
+        //射撃判定(トリガー入力に余裕を持たせる)
         if (playerInput.Player.Fire.ReadValue<float>() > 0.3f)
         {
             if (fireInterval % 10 == 0)
@@ -90,15 +124,30 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void Jump()
     {
 
         if (isGrounded())
         {
+            //スティック入力取得
+            Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
             moveSpeedRate = 1.0f;
+
+            //前後移動中またはジャンプ入力したらジャンプ
             if (playerInput.Player.Jump.triggered)
             {
-                rigidbody.AddForce(Vector3.up * 5.0f, ForceMode.VelocityChange);
+                //横移動中かつジャンプ入力したらローリング
+                if (Mathf.Abs(inputValue.x)>0.2f)
+                {
+                    isRolling = true;
+                }
+                else
+                {
+                    rigidbody.AddForce(Vector3.up * 5.0f, ForceMode.VelocityChange);
+                }
             }
         }
         else
@@ -107,6 +156,34 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    private void Rolling()
+    {
+        if (isRolling)
+        {
+            Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
+
+            Vector3 velocity = new Vector3(
+                inputValue.x,
+                0.0f,
+                inputValue.y);
+
+            //ローリング加速
+            if (inputValue.x != 0.0f)
+            {
+                rigidbody.AddForce(velocity * 10.0f, ForceMode.VelocityChange);
+                isRolling = false;
+            }
+            
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     private bool isGrounded()
     {
         Vector3 rayPos = transform.position + new Vector3(0.0f, +0.1f, 0.0f);
