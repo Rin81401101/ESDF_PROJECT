@@ -63,7 +63,10 @@ public class PlayerManager : MonoBehaviour
         if (inputValue.sqrMagnitude == 0.0f)
         {
             animator.SetBool("isIdle", true);
-            animator.SetBool("isWalk", false);
+            animator.SetBool("isWalkBack", false);
+            animator.SetBool("isWalkFoward", false);
+            animator.SetBool("isWalkRight", false);
+            animator.SetBool("isWalkLeft", false);
         }
 
         //移動
@@ -93,7 +96,25 @@ public class PlayerManager : MonoBehaviour
 
         if (inputValue.sqrMagnitude != 0.0f)
         {
-            animator.SetBool("isWalk", true);
+            if (inputValue.x > 0)
+            {
+                animator.SetBool("isWalkRight", true);
+            }
+            else if (inputValue.x < 0)
+            {
+                animator.SetBool("isWalkLeft", true);
+            }
+
+            if (inputValue.y < 0 && inputValue.x < 0.2)
+            {
+                animator.SetBool("isWalkBack", true);
+            }
+            else if (inputValue.y > 0 && inputValue.x < 0.2)
+            {
+                animator.SetBool("isWalkFoward", true);
+            }
+
+
             animator.SetBool("isIdle", false);
 
             //プレイヤー移動
@@ -140,14 +161,14 @@ public class PlayerManager : MonoBehaviour
             if (playerInput.Player.Jump.triggered)
             {
                 //横移動中かつジャンプ入力したらローリング
-                if (Mathf.Abs(inputValue.x)>0.2f)
+                if (Mathf.Abs(inputValue.x) > 0.2f)
                 {
                     isRolling = true;
                 }
                 else
                 {
                     animator.SetBool("isJumpUp", true);
-                    if(isJumpEnd)
+                    if (isJumpEnd)
                     {
                         rigidbody.AddForce(Vector3.up * 5.0f, ForceMode.VelocityChange);
                         if (isGroundTmp != isGrounded())
@@ -169,7 +190,7 @@ public class PlayerManager : MonoBehaviour
         //1フレーム前の判定処理
 
         isGroundTmp = isGrounded();
-        
+
     }
 
     /// <summary>
@@ -192,7 +213,7 @@ public class PlayerManager : MonoBehaviour
                 rigidbody.AddForce(velocity * 10.0f, ForceMode.VelocityChange);
                 isRolling = false;
             }
-            
+
         }
     }
 
