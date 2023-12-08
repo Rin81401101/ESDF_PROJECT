@@ -20,11 +20,11 @@ public class PlayerManager : MonoBehaviour
     [Header("移動速度レート"), SerializeField]
     private float moveSpeedRate = 0.0f;
 
-    [Header("ローリング速度レート"), SerializeField]
-    private float rollingSpeedRate = 0.0f;
-
-    [Header("ローリング中"), SerializeField]
     private bool isRolling = false;
+
+    private bool isJumpEnd = false;
+
+    private bool isGroundTmp = false;
 
     [Header("rayの長さ"), SerializeField]
     private float rayLength;
@@ -98,9 +98,9 @@ public class PlayerManager : MonoBehaviour
 
             //プレイヤー移動
             Vector3 moveVelocity = new Vector3(
-                inputValue.x * moveSpeed * moveSpeedRate * rollingSpeedRate * inputValue.magnitude * Time.deltaTime,
+                inputValue.x * moveSpeed * moveSpeedRate * inputValue.magnitude * Time.deltaTime,
                 0.0f,//ジャンプ
-                inputValue.y * moveSpeed * moveSpeedRate * rollingSpeedRate * inputValue.magnitude * Time.deltaTime);
+                inputValue.y * moveSpeed * moveSpeedRate * inputValue.magnitude * Time.deltaTime);
 
             transform.position += moveVelocity;
         }
@@ -146,7 +146,16 @@ public class PlayerManager : MonoBehaviour
                 }
                 else
                 {
-                    rigidbody.AddForce(Vector3.up * 5.0f, ForceMode.VelocityChange);
+                    animator.SetBool("isJumpUp", true);
+                    if(isJumpEnd)
+                    {
+                        rigidbody.AddForce(Vector3.up * 5.0f, ForceMode.VelocityChange);
+                        if (isGroundTmp != isGrounded())
+                        {
+                            Debug.Log("isGroundTmp" + isGroundTmp);
+                            animator.SetBool("isJumDown", true);
+                        }
+                    }
                 }
             }
         }
@@ -154,6 +163,13 @@ public class PlayerManager : MonoBehaviour
         {
             moveSpeedRate = 0.25f;
         }
+
+        //1フレーム前の値を取得
+        //移動処理
+        //1フレーム前の判定処理
+
+        isGroundTmp = isGrounded();
+        
     }
 
     /// <summary>
@@ -178,6 +194,13 @@ public class PlayerManager : MonoBehaviour
             }
             
         }
+    }
+
+    public void isJumpUpEnd()
+    {
+        animator.SetBool("isJumpUpEnd", true);
+        isJumpEnd = true;
+        Debug.Log("isJumpUpEnd");
     }
 
     /// <summary>
