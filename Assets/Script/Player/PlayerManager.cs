@@ -9,6 +9,9 @@ public class PlayerManager : MonoBehaviour
     //入力管理
     private PlayerInputAction playerInput;
 
+    [Header("アニメーションマネージャー"), SerializeField]
+    private PlayerAnimationManager playerAnimationManager ;
+
     private Rigidbody rigidbody;
 
     [Header("アニメーター"), SerializeField]
@@ -20,9 +23,10 @@ public class PlayerManager : MonoBehaviour
     [Header("移動速度レート"), SerializeField]
     private float moveSpeedRate = 0.0f;
 
-    private bool isRolling = false;
+    [Header("ジャンプ力"), SerializeField]
+    private float jumpPower;
 
-    private bool isJumpEnd = false;
+    private bool isRolling = false;
 
     private bool isGroundTmp = false;
 
@@ -58,17 +62,6 @@ public class PlayerManager : MonoBehaviour
     {
         GravityManager.instance.gravityUpdate(rigidbody);
 
-        //スティック入力取得
-        Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
-        if (inputValue.sqrMagnitude == 0.0f)
-        {
-            animator.SetBool("isIdle", true);
-            animator.SetBool("isWalkBack", false);
-            animator.SetBool("isWalkFoward", false);
-            animator.SetBool("isWalkRight", false);
-            animator.SetBool("isWalkLeft", false);
-        }
-
         //移動
         Move();
 
@@ -96,26 +89,8 @@ public class PlayerManager : MonoBehaviour
 
         if (inputValue.sqrMagnitude != 0.0f)
         {
-            if (inputValue.x > 0)
-            {
-                animator.SetBool("isWalkRight", true);
-            }
-            else if (inputValue.x < 0)
-            {
-                animator.SetBool("isWalkLeft", true);
-            }
-
-            if (inputValue.y < 0 && inputValue.x < 0.2)
-            {
-                animator.SetBool("isWalkBack", true);
-            }
-            else if (inputValue.y > 0 && inputValue.x < 0.2)
-            {
-                animator.SetBool("isWalkFoward", true);
-            }
-
-
-            animator.SetBool("isIdle", false);
+            //プレイヤー移動アニメーション
+            playerAnimationManager.MoveAnimation(inputValue, inputValue.magnitude);
 
             //プレイヤー移動
             Vector3 moveVelocity = new Vector3(
@@ -150,7 +125,7 @@ public class PlayerManager : MonoBehaviour
     /// </summary>
     private void Jump()
     {
-
+        playerAnimationManager.IsJumpDownEnd();
         if (isGrounded())
         {
             //スティック入力取得
@@ -167,16 +142,18 @@ public class PlayerManager : MonoBehaviour
                 }
                 else
                 {
-                    animator.SetBool("isJumpUp", true);
-                    if (isJumpEnd)
-                    {
-                        rigidbody.AddForce(Vector3.up * 5.0f, ForceMode.VelocityChange);
-                        if (isGroundTmp != isGrounded())
-                        {
-                            Debug.Log("isGroundTmp" + isGroundTmp);
-                            animator.SetBool("isJumDown", true);
-                        }
-                    }
+                    playerAnimationManager.PlayJumpUpAnimation();
+                }
+            }
+
+            if (playerAnimationManager.GetIsJumpUpEnd())
+            {
+                rigidbody.AddForce(Vector3.up * jumpPower, ForceMode.VelocityChange);
+                if (isGroundTmp != isGrounded(true))
+                {
+                    Debug.Log("isGroundTmp" + isGroundTmp);
+                    playerAnimationManager.SetIsJumpUpEnd(false);
+                    playerAnimationManager.PlayJumpDownAnimation();
                 }
             }
         }
@@ -185,12 +162,7 @@ public class PlayerManager : MonoBehaviour
             moveSpeedRate = 0.25f;
         }
 
-        //1フレーム前の値を取得
-        //移動処理
-        //1フレーム前の判定処理
-
         isGroundTmp = isGrounded();
-
     }
 
     /// <summary>
@@ -217,22 +189,22 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    public void isJumpUpEnd()
-    {
-        animator.SetBool("isJumpUpEnd", true);
-        isJumpEnd = true;
-        Debug.Log("isJumpUpEnd");
-    }
+
 
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    private bool isGrounded()
+    private bool isGrounded(bool isAnimation = false)
     {
+        float lengthRate = 1.0f;
+        if(isAnimation)
+        {
+            lengthRate = 2.0f;
+        }
+
         Vector3 rayPos = transform.position + new Vector3(0.0f, +0.1f, 0.0f);
         Ray ray = new Ray(rayPos, Vector3.down);
-        return Physics.Raycast(ray, rayLength);
-
+        return Physics.Raycast(ray, rayLength * lengthRate);
     }
 }

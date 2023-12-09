@@ -2133,9 +2133,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fabc446acec4a4e959bbb411198a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerAnimationManager: {fileID: 2131468709}
   animator: {fileID: 2131468708}
   moveSpeed: 7
   moveSpeedRate: 0
+  jumpPower: 0.2
   rayLength: 0.3
   bullet: {fileID: 5051535908429709834, guid: 89458cc247d9fd746ac57cb067f7e7cd, type: 3}
 --- !u!65 &1386409179
@@ -3165,9 +3167,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2131468706}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b5f8ea2441e9e646b65541dee5b8631, type: 3}
+  m_Script: {fileID: 11500000, guid: 52ef9b62a5920cf43bdf4a1d1361c88c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerAnimator: {fileID: 2131468708}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
