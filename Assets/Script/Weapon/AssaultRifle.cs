@@ -75,6 +75,16 @@ public class AssaultRifle : WeaponBase {
 
     }
 
+    //強制リロード
+    public override void OnReload() {
+        if (m_isReload) return;
+
+        m_canShot=false;
+        m_isReload = true;
+        m_reloadTimer = 0;
+        m_bulletNum = 0;
+    }
+
     //リロード中だったらtrue
     public override bool GetIsReload() {
         return m_isReload;

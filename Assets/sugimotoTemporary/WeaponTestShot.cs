@@ -21,6 +21,10 @@ public class WeaponTestShot : MonoBehaviour
             if (Input.GetKey(KeyCode.Space)) {
                 weapon.Shot();
             }
+
+            if (Input.GetKey(KeyCode.R)) {
+                weapon.OnReload();
+            }
         }
     }
 }

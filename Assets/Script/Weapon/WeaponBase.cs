@@ -8,6 +8,7 @@ public abstract class WeaponBase : MonoBehaviour
     protected Bullet m_bullet;
 
     public abstract void Shot();
+    public abstract void OnReload();
     public abstract bool GetIsReload();
     public abstract float GetReloadRatio();
 }
