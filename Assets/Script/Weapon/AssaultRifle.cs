@@ -3,12 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-/*
- * 
- * 外部から使いたいときはShot()呼んどけ
- * 発射間隔とかはいい感じでやってる
- */
-
 public class AssaultRifle : WeaponBase {
     [SerializeField]
     Transform m_muzzleTransform;
@@ -76,7 +70,7 @@ public class AssaultRifle : WeaponBase {
     }
 
     //強制リロード
-    public override void OnReload() {
+    public override void Reload() {
         if (m_isReload) return;
 
         m_canShot=false;

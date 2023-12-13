@@ -12,19 +12,16 @@ public class ReloadUITest : MonoBehaviour
     Image m_image;
 
     [SerializeField]
-    WeaponBase m_weapon;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    WeaponTestShot m_player;
+    
+
 
     // Update is called once per frame
     void Update()
     {
-        m_image.fillAmount=m_weapon.GetReloadRatio();
+        m_image.fillAmount= m_player.GetWeapon().GetReloadRatio();
 
-        if (m_weapon.GetIsReload()) {
+        if (m_player.GetWeapon().GetIsReload()) {
             m_imageParent.SetActive(true);
         } else {
             m_imageParent.SetActive(false);

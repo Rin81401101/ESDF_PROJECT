@@ -4,27 +4,30 @@ using UnityEngine;
 
 public class WeaponTestShot : MonoBehaviour
 {
-    [SerializeField]
-    GameObject weaponObj;
-    WeaponBase weapon;
+
+    WeaponBase m_weapon;
 
     // Start is called before the first frame update
     void Start()
     {
-        weapon = weaponObj.GetComponent<AssaultRifle>();    
+        m_weapon = WeaponManager.m_instance.AttachWeapon(this.gameObject, "AssaultRifle");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (weapon != null) {
+        if (m_weapon != null) {
             if (Input.GetKey(KeyCode.Space)) {
-                weapon.Shot();
+                m_weapon.Shot();
             }
 
             if (Input.GetKey(KeyCode.R)) {
-                weapon.OnReload();
+                m_weapon.Reload();
             }
         }
+    }
+
+    public WeaponBase GetWeapon() {
+        return m_weapon;
     }
 }
