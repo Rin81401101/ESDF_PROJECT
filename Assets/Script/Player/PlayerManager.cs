@@ -33,8 +33,12 @@ public class PlayerManager : MonoBehaviour
     [Header("rayの長さ"), SerializeField]
     private float rayLength;
 
-    [Header("弾丸Prefab"), SerializeField]
-    private GameObject bullet;
+    [Header("武器attach箇所"), SerializeField]
+    private GameObject WeaponAttachParent;
+
+    WeaponBase weapon;
+    [SerializeField]
+    Vector3 scale;
 
     //発射間隔
     private int fireInterval = 0;
@@ -44,7 +48,20 @@ public class PlayerManager : MonoBehaviour
         playerInput = new PlayerInputAction();
         rigidbody = GetComponent<Rigidbody>();
 
-        DG.Tweening.DOTween.SetTweensCapacity(tweenersCapacity: 200, sequencesCapacity: 500);
+        weapon = WeaponManager.m_instance.AttachWeapon(WeaponAttachParent, "AssaultRifle");
+        weapon.gameObject.transform.localScale = scale;
+
+        //回転軸　武器のベクトルと向けたい方向のベクトルで外積
+        Vector3 rotateAxis = Vector3.Cross(weapon.gameObject.transform.forward, this.transform.forward);
+        Debug.Log(rotateAxis);
+
+        //回転角度 武器のベクトルと向けたい方向のベクトルで内積
+        float rotateAngle = Vector3.Dot(weapon.gameObject.transform.forward, this.transform.forward);
+        Debug.Log(rotateAngle);
+
+
+        //出した回転軸に回転角度を与える
+        weapon.gameObject.transform.rotation = Quaternion.AxisAngle(rotateAxis, rotateAngle);
     }
 
     private void OnEnable()
@@ -107,16 +124,16 @@ public class PlayerManager : MonoBehaviour
     /// </summary>
     private void Fire()
     {
-        //射撃インターバル
-        fireInterval++;
 
         //射撃判定(トリガー入力に余裕を持たせる)
         if (playerInput.Player.Fire.ReadValue<float>() > 0.3f)
         {
-            if (fireInterval % 10 == 0)
-            {
-                Instantiate(bullet, this.transform.position, this.transform.rotation);
-            }
+            weapon.Shot();
+        }
+
+        if (playerInput.Player.Reload.triggered)
+        {
+            weapon.Reload();
         }
     }
 
