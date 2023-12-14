@@ -50,7 +50,7 @@ public class AssaultRifle : WeaponBase {
     public override void Shot() {
         if (m_canShot) {
             //íeÇÃê∂ê¨
-            Instantiate(m_bullet, m_muzzleTransform);
+            Instantiate(m_bullet, m_muzzleTransform.position, m_muzzleTransform.rotation);
 
 
             m_bulletNum--;//íeÇå∏ÇÁÇ∑
