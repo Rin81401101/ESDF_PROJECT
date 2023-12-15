@@ -12,7 +12,7 @@ public class PlayerManager : MonoBehaviour
     [Header("アニメーションマネージャー"), SerializeField]
     private PlayerAnimationManager playerAnimationManager ;
 
-    private Rigidbody rigidbody;
+    private Rigidbody rb;
 
     [Header("アニメーター"), SerializeField]
     private Animator animator;
@@ -37,6 +37,7 @@ public class PlayerManager : MonoBehaviour
     private GameObject WeaponAttachParent;
 
     WeaponBase weapon;
+
     [SerializeField]
     Vector3 scale;
 
@@ -46,9 +47,9 @@ public class PlayerManager : MonoBehaviour
     private void Awake()
     {
         playerInput = new PlayerInputAction();
-        rigidbody = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
 
-        weapon = WeaponManager.m_instance.AttachWeapon(WeaponAttachParent, "AssaultRifle");
+        weapon = WeaponManager.m_instance.AttachWeapon(WeaponAttachParent, "AssaultRifle"); 
         weapon.gameObject.transform.localScale = scale;
 
         //回転軸　武器のベクトルと向けたい方向のベクトルで外積
@@ -77,7 +78,9 @@ public class PlayerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GravityManager.instance.gravityUpdate(rigidbody);
+        GravityManager.instance.gravityUpdate(rb);
+
+        //WeaponManager.m_instance.m_weaponUI.GetComponent<WeaponUI>().m_reloadUIMain.fillAmount = weapon.GetReloadRatio();
 
         //移動
         Move();
@@ -165,7 +168,7 @@ public class PlayerManager : MonoBehaviour
 
             if (playerAnimationManager.GetIsJumpUpEnd())
             {
-                rigidbody.AddForce(Vector3.up * jumpPower, ForceMode.VelocityChange);
+                rb.AddForce(Vector3.up * jumpPower, ForceMode.VelocityChange);
                 if (isGroundTmp != isGrounded(true))
                 {
                     Debug.Log("isGroundTmp" + isGroundTmp);
@@ -199,7 +202,7 @@ public class PlayerManager : MonoBehaviour
             //ローリング加速
             if (inputValue.x != 0.0f)
             {
-                rigidbody.AddForce(velocity * 10.0f, ForceMode.VelocityChange);
+                rb.AddForce(velocity * 10.0f, ForceMode.VelocityChange);
                 isRolling = false;
             }
 
