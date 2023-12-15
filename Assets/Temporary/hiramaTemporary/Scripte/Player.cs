@@ -51,13 +51,10 @@ public class Player : MonoBehaviour
                 playerNodeNumMin = i;
             }
             //以降は座標間距離を比較、距離が短い方に更新
-            else
+            else if (playerNodePosDisMin > tempNodePos.nodePosDis)
             {
-                if (playerNodePosDisMin > tempNodePos.nodePosDis)
-                {
-                    playerNodePosDisMin = tempNodePos.nodePosDis;
-                    playerNodeNumMin = i;
-                }
+                playerNodePosDisMin = tempNodePos.nodePosDis;
+                playerNodeNumMin = i;
             }
 
             //座標情報、座標間距離の組合せをリストに格納
