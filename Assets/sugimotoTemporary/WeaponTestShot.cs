@@ -10,7 +10,7 @@ public class WeaponTestShot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_weapon = WeaponManager.m_instance.AttachWeapon(this.gameObject, "AssaultRifle");
+        m_weapon = WeaponManager.m_instance.AttachWeapon(this.gameObject, "Missile");
     }
 
     // Update is called once per frame

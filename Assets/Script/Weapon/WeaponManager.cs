@@ -2,14 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEditor.UI;
+using UnityEngine.UI;
 
 public class WeaponManager : MonoBehaviour {
 
     public static WeaponManager m_instance = null;
-    public Dictionary<string, List<GameObject>> m_weaponList = new Dictionary<string, List<GameObject>>();
+
+    private Dictionary<string, List<GameObject>> m_weaponList = new Dictionary<string, List<GameObject>>();
+
+    [SerializeField]
+    private GameObject m_weaponUIPrefab;
+
+    [HideInInspector]
+    public GameObject m_weaponUI;
 
     private void Awake() {
         m_instance = this;
+
+        m_weaponUI=Instantiate(m_weaponUI);
 
         //Weapon以下の全ファイルパス取得
         string path = Application.dataPath + "/Prefab/Weapon";
