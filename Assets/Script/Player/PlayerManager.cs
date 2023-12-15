@@ -49,7 +49,7 @@ public class PlayerManager : MonoBehaviour
         playerInput = new PlayerInputAction();
         rb = GetComponent<Rigidbody>();
 
-        weapon = WeaponManager.m_instance.AttachWeapon(WeaponAttachParent, "AssaultRifle"); 
+        weapon = WeaponManager.m_instance.AttachWeapon(WeaponAttachParent, "Missile"); 
         weapon.gameObject.transform.localScale = scale;
 
         //回転軸　武器のベクトルと向けたい方向のベクトルで外積
