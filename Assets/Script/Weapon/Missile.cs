@@ -102,6 +102,24 @@ public class Missile : WeaponBase {
                 }
             }
         }
+
+        //ロックオン中のエネミーの範囲内チェック
+        if(m_lockOnEnemy!=null) {
+            bool canLockOn = GetCanRockOn(m_lockOnEnemy.transform.position);
+            if(!canLockOn) {
+                //ロックオン範囲外のエネミーをリストから削除
+                if (m_rangeInEnemyList.Contains(m_lockOnEnemy) == true) {
+                    m_rangeInEnemyList.Remove(m_lockOnEnemy);
+                }
+
+                //ロックオンしている敵がロックオン範囲外に出たのでリストから消す
+                if (m_lockOnEnemyList.Contains(m_lockOnEnemy) == true) {
+                    m_lockOnEnemyList.Remove(m_lockOnEnemy);
+                }
+                m_lockOnEnemy = null;
+            }
+
+        }
     }
 
     private void LockOn() {
@@ -174,9 +192,10 @@ public class Missile : WeaponBase {
                     missileBullet.SetRotationSpeedRatio(m_rotationSpeedRatio);
                     missileBullet.SetMoveSpeed(m_moveSpeed);
                 }
+                m_isReload = true;
+                m_reloadTimer = 0;
             }
-            m_isReload = true;
-            m_reloadTimer = 0;
+            
         }
     }
 
@@ -186,6 +205,8 @@ public class Missile : WeaponBase {
             m_lockOnImageList[i].enabled = false;
         }
         m_lockOnRangeUI.enabled = false;
+        m_lockOnEnemy=null;
+        m_lockOnTimer = 0;
         m_lockOnEnemyList.Clear();
     }
 
@@ -199,6 +220,8 @@ public class Missile : WeaponBase {
         if (m_isReload) return;
         m_isReload = true;
         m_reloadTimer = 0;
+
+        DisableLockOn();
     }
 
     //リロード中だったらtrue
