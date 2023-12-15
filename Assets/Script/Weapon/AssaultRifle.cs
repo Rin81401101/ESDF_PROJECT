@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class AssaultRifle : WeaponBase {
     [SerializeField]
+    protected Bullet m_bullet;
+
+    [SerializeField]
     Transform m_muzzleTransform;
 
     [SerializeField]

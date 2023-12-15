@@ -4,9 +4,6 @@ using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour
 {
-    [SerializeField]
-    protected Bullet m_bullet;
-
     public abstract void Shot();
     public abstract void Reload();
     public abstract bool GetIsReload();
