@@ -20,7 +20,7 @@ public class WeaponManager : MonoBehaviour {
     private void Awake() {
         m_instance = this;
 
-        m_weaponUI=Instantiate(m_weaponUI);
+        m_weaponUI=Instantiate(m_weaponUIPrefab);
 
         //Weapon以下の全ファイルパス取得
         string path = Application.dataPath + "/Prefab/Weapon";
