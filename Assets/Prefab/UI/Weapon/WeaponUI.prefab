@@ -116,6 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5530b8afaeee9a4c9be0ccc234566b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_reloadUIParent: {fileID: 8065301585782649946}
   m_reloadUIMain: {fileID: 5240320157611725471}
   m_lockOnUIParent: {fileID: 3606794535397490833}
 --- !u!1 &3606794535397490833
