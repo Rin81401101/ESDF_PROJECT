@@ -13,7 +13,7 @@ public class Node : MonoBehaviour
 
     [Header("次の行先経由地点"), SerializeField] public List<Node> nextNodeObjList = new List<Node>();
 
-    [Header("プレイヤーの最寄経由地点"), HideInInspector] public bool isPlayer;
+    [Header("プレイヤーの最寄経由地点"), SerializeField] public bool isPlayer;
 
 
     void Reset()

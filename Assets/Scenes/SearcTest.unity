@@ -152,7 +152,7 @@ Transform:
   m_GameObject: {fileID: 432518379}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.04, y: 0.69052446, z: 5.19}
+  m_LocalPosition: {x: 6.52, y: 0.69052446, z: 2.69}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -401,6 +401,7 @@ MonoBehaviour:
   - {fileID: 1824852430}
   - {fileID: 1051492698}
   - {fileID: 807591839}
+  - {fileID: 1072582551}
   isPlayer: 0
 --- !u!135 &704919045
 SphereCollider:
@@ -616,6 +617,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextNodeObjList:
   - {fileID: 1387487581}
+  - {fileID: 2046676953}
+  - {fileID: 1294930056}
+  - {fileID: 704919044}
   isPlayer: 0
 --- !u!135 &807591840
 SphereCollider:
@@ -900,6 +904,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextNodeObjList:
   - {fileID: 1387487581}
+  - {fileID: 2046676953}
+  - {fileID: 1294930056}
+  - {fileID: 704919044}
   isPlayer: 0
 --- !u!1 &1072582549
 GameObject:
@@ -1132,6 +1139,7 @@ MonoBehaviour:
   - {fileID: 1824852430}
   - {fileID: 1051492698}
   - {fileID: 807591839}
+  - {fileID: 1072582551}
   isPlayer: 0
 --- !u!135 &1294930057
 SphereCollider:
@@ -1338,8 +1346,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nextNodeObjList:
-  - {fileID: 0}
-  isPlayer: 1
+  - {fileID: 1824852430}
+  - {fileID: 1051492698}
+  - {fileID: 807591839}
+  isPlayer: 0
 --- !u!1 &1441000658
 GameObject:
   m_ObjectHideFlags: 0
@@ -1369,7 +1379,7 @@ Transform:
   m_GameObject: {fileID: 1441000658}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.08, y: 0.81, z: -3.23}
+  m_LocalPosition: {x: -1.51, y: 0.81, z: -2.93}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1561,13 +1571,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1545320660}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.34709233, z: -0, w: 0.937831}
-  m_LocalPosition: {x: 1.57, y: 1.65, z: -1.11}
+  m_LocalRotation: {x: 0, y: 0.2773147, z: 0, w: 0.96077913}
+  m_LocalPosition: {x: 2.99, y: 1.65, z: -1.51}
   m_LocalScale: {x: 7.396438, y: 3.1494625, z: 0.6326}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 40.619, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 32.2, z: 0}
 --- !u!54 &1545320665
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1715,6 +1725,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextNodeObjList:
   - {fileID: 1387487581}
+  - {fileID: 2046676953}
+  - {fileID: 1294930056}
+  - {fileID: 704919044}
   isPlayer: 0
 --- !u!1 &2046676952
 GameObject:
@@ -1752,6 +1765,7 @@ MonoBehaviour:
   - {fileID: 1824852430}
   - {fileID: 1051492698}
   - {fileID: 807591839}
+  - {fileID: 1072582551}
   isPlayer: 0
 --- !u!135 &2046676954
 SphereCollider:

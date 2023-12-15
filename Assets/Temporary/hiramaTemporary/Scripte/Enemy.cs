@@ -84,13 +84,10 @@ public class Enemy : MonoBehaviour
                     firstNodeNumMin = i;
                 }
                 //以降は座標間距離を比較、距離が短い方に更新
-                else
+                else if (firstNodePosDisMin > tempNodePos.nodePosDis)
                 {
-                    if (firstNodePosDisMin > tempNodePos.nodePosDis)
-                    {
-                        firstNodePosDisMin = tempNodePos.nodePosDis;
-                        firstNodeNumMin = i;
-                    }
+                    firstNodePosDisMin = tempNodePos.nodePosDis;
+                    firstNodeNumMin = i;
                 }
 
                 //座標情報、座標間距離の組合せをリストに格納
@@ -154,6 +151,7 @@ public class Enemy : MonoBehaviour
                 }
 
                 Debug.Log("経路一覧：" + string.Join(", ", tempNodeObjectList) + tempNodePosDis);
+
                 //一時リスト、座標間距離をクリア
                 tempNodeObjectList.Clear();
                 tempNodePosDis = 0;
@@ -164,6 +162,19 @@ public class Enemy : MonoBehaviour
 
             //最終地点の場合、処理を終了する
             if (nextNodeObject.isPlayer)
+            {
+                return;
+            }
+            //次の経由地点を取得できなかった場合、一時リスト、座標間距離を初期化して終了する
+            else if (temp == null)
+            {
+                tempNodeObjectList.Clear();
+                tempNodePosDis = 0;
+                return;
+            }
+
+            //このままだとisPlayerのノードまでぬけるよ
+            if (temp.isPlayer == true)
             {
                 return;
             }
