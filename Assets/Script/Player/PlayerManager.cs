@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using DG.Tweening;
+using UnityEngine.UI;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -37,6 +38,7 @@ public class PlayerManager : MonoBehaviour
     private GameObject WeaponAttachParent;
 
     WeaponBase weapon;
+    WeaponUI weaponUI;
 
     [SerializeField]
     Vector3 scale;
@@ -48,6 +50,7 @@ public class PlayerManager : MonoBehaviour
     {
         playerInput = new PlayerInputAction();
         rb = GetComponent<Rigidbody>();
+        weaponUI = WeaponManager.m_instance.m_weaponUI.GetComponent<WeaponUI>();
 
         weapon = WeaponManager.m_instance.AttachWeapon(WeaponAttachParent, "Missile"); 
         weapon.gameObject.transform.localScale = scale;
@@ -80,7 +83,8 @@ public class PlayerManager : MonoBehaviour
     {
         GravityManager.instance.gravityUpdate(rb);
 
-        //WeaponManager.m_instance.m_weaponUI.GetComponent<WeaponUI>().m_reloadUIMain.fillAmount = weapon.GetReloadRatio();
+        weaponUI.m_reloadUIMain.fillAmount = weapon.GetReloadRatio();
+        weaponUI.m_reloadUIParent.SetActive(weapon.GetIsReload());
 
         //ˆÚ“®
         Move();

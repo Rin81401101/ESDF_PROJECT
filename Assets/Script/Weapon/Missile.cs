@@ -30,7 +30,7 @@ public class Missile : WeaponBase {
     List<GameObject> m_lockOnEnemyList= new List<GameObject>();//ロックオンが終わった敵
     List<Image> m_lockOnImageList = new List<Image>();
     Vector2 m_lockOnRangeDefaultSize = new Vector2();
-    Image m_lockOnRange;
+    Image m_lockOnRangeUI;
     private GameObject m_enemyParentObj;
     private GameObject m_lockOnEnemy=null;//ロックオン中の敵
     private float m_reloadTimer = 0.05f;
@@ -42,15 +42,15 @@ public class Missile : WeaponBase {
     private void Start() {
         m_reloadTimer = m_reloadTime;
         m_enemyParentObj = GameObject.Find("Enemys");
+        m_reloadTimer = m_reloadTime;
 
-        
         WeaponUI weaponUI = WeaponManager.m_instance.m_weaponUI.GetComponent<WeaponUI>();
 
         //ロックオン範囲UIを生成する
         Image rangeImage = Instantiate(m_lockOnRangeImage, weaponUI.m_lockOnUIParent.transform);
         m_lockOnRangeDefaultSize = rangeImage.rectTransform.sizeDelta;
         rangeImage.rectTransform.sizeDelta = m_lockOnRangeDefaultSize * m_lockOnRangeRatio;
-        m_lockOnRange = rangeImage;
+        m_lockOnRangeUI = rangeImage;
 
         //敵のロックオンUIを生成する
         for (int i = 0; i < m_bulletMax; i++) {
@@ -61,61 +61,57 @@ public class Missile : WeaponBase {
     }
   
     void Update() {
-        if (m_isLockOn)
-        {
-            LockOn();
+        if (m_isReload) {
+            m_reloadTimer += Time.deltaTime;
+
+            //リロード完了
+            if (GetReloadRatio() >= 1) {
+                m_reloadTimer = m_reloadTime;
+                m_isReload = false;
+            }
         } else {
-            //ロックオンしている敵がいるか
-            bool canShot = false;
-            for(int i=0; i< m_lockOnImageList.Count; i++) {
-                if(m_lockOnImageList[i].enabled) {
-                    canShot = true;
-                    break;
-                }
+            if (m_isLockOn) {
+                LockOn();
+            } else {
+                //ロックオンが終了したタイミングでミサイルを発射する
+                MissileShot();
+                DisableLockOn();
             }
-
-            //ミサイルの発射
-            if(canShot) {
-                for(int i=0; i< m_lockOnEnemyList.Count;i++) {
-                    GameObject bullet = Instantiate(m_bullet.gameObject, m_muzzle.transform.position, m_muzzle.transform.rotation);
-                    MissileBullet missileBullet = bullet.GetComponent<MissileBullet>();
-                    if(missileBullet != null) {
-                        missileBullet.SetTarget(m_lockOnEnemyList[i]);
-                        missileBullet.SetRotationSpeedRatio(m_rotationSpeedRatio);
-                        missileBullet.SetMoveSpeed(m_moveSpeed);
-                    }
-                }
-            }
-
-            DisableLockOn();
         }
         m_isLockOn = false;
     }
 
-    private void LockOn() {
-        //ロックオン範囲内の敵をm_enemyListに入れる
+    private void LockOnRangeCheck() {
+        //全体のエネミーからロックオン範囲内か探す
         for (int i = 0; i < m_enemyParentObj.transform.childCount; i++) {
             bool canLockOn = GetCanRockOn(m_enemyParentObj.transform.GetChild(i).gameObject.transform.position);
             if (canLockOn) {
-                if (m_rangeInEnemyList.Contains(m_enemyParentObj.transform.GetChild(i).gameObject)==false) {
+                //ロックオン範囲内
+                if (m_rangeInEnemyList.Contains(m_enemyParentObj.transform.GetChild(i).gameObject) == false) {
                     m_rangeInEnemyList.Add(m_enemyParentObj.transform.GetChild(i).gameObject);
                 }
             } else {
-                if (m_rangeInEnemyList.Contains(m_enemyParentObj.transform.GetChild(i).gameObject) == true) { 
+                //ロックオン範囲外のエネミーをリストから削除
+                if (m_rangeInEnemyList.Contains(m_enemyParentObj.transform.GetChild(i).gameObject) == true) {
                     m_rangeInEnemyList.Remove(m_enemyParentObj.transform.GetChild(i).gameObject);
                 }
 
                 //ロックオンしている敵がロックオン範囲外に出たのでリストから消す
-                if(m_lockOnEnemyList.Contains(m_enemyParentObj.transform.GetChild(i).gameObject) == true) {
+                if (m_lockOnEnemyList.Contains(m_enemyParentObj.transform.GetChild(i).gameObject) == true) {
                     m_lockOnEnemyList.Remove(m_enemyParentObj.transform.GetChild(i).gameObject);
-    }
+                }
             }
         }
-        ////////////////
-        //ここでロックオン
-        ////////////////
-        
-        //ロックオンした敵の数を取得
+    }
+
+    private void LockOn() {
+        //ロックオン範囲内の敵をm_enemyListに入れる
+        LockOnRangeCheck();
+
+
+        ///////////////////////////////////////////
+        //---------ロックオン処理本体--------------//
+        ///////////////////////////////////////////
         int lockOnCount = m_lockOnEnemyList.Count;
         if (lockOnCount < m_bulletMax) {
             //ロックオン対象の敵を取得
@@ -153,7 +149,35 @@ public class Missile : WeaponBase {
             }
         }
 
-        m_lockOnRange.enabled = true;
+        //ロックオン範囲の四角いUIを表示させる
+        m_lockOnRangeUI.enabled = true;
+    }
+
+    //ミサイルを生成して発射する
+    void MissileShot() {
+        //ロックオンしている敵がいるか
+        bool canShot = false;
+        for (int i = 0; i < m_lockOnImageList.Count; i++) {
+            if (m_lockOnImageList[i].enabled) {
+                canShot = true;
+                break;
+            }
+        }
+
+        //ミサイルの発射
+        if (canShot) {
+            for (int i = 0; i < m_lockOnEnemyList.Count; i++) {
+                GameObject bullet = Instantiate(m_bullet.gameObject, m_muzzle.transform.position, m_muzzle.transform.rotation);
+                MissileBullet missileBullet = bullet.GetComponent<MissileBullet>();
+                if (missileBullet != null) {
+                    missileBullet.SetTarget(m_lockOnEnemyList[i]);
+                    missileBullet.SetRotationSpeedRatio(m_rotationSpeedRatio);
+                    missileBullet.SetMoveSpeed(m_moveSpeed);
+                }
+            }
+            m_isReload = true;
+            m_reloadTimer = 0;
+        }
     }
 
     //ロックオン終了
@@ -161,7 +185,7 @@ public class Missile : WeaponBase {
         for (int i = 0; i < m_bulletMax; i++) {
             m_lockOnImageList[i].enabled = false;
         }
-        m_lockOnRange.enabled = false;
+        m_lockOnRangeUI.enabled = false;
         m_lockOnEnemyList.Clear();
     }
 
@@ -172,7 +196,9 @@ public class Missile : WeaponBase {
 
     //強制リロード
     public override void Reload() {
-
+        if (m_isReload) return;
+        m_isReload = true;
+        m_reloadTimer = 0;
     }
 
     //リロード中だったらtrue
