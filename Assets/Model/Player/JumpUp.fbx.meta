@@ -58,7 +58,7 @@ ModelImporter:
       curves: []
       events:
       - time: 0.33268103
-        functionName: PlayJumpUpEnd
+        functionName: StopJumpUpAnimation
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: 52ef9b62a5920cf43bdf4a1d1361c88c, type: 3}
         floatParameter: 0

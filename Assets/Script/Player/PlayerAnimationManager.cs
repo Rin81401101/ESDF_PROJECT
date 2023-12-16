@@ -9,63 +9,52 @@ public class PlayerAnimationManager : MonoBehaviour
     // Start is called before the first frame update
 
     [Header("アニメーター"),SerializeField]
-    private Animator playerAnimator;
+    private Animator m_playerAnimator;
 
-    private bool isJumpUpEnd = false;
+    private bool m_isJumpUpEnd = false;
 
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    public void MoveAnimation(Vector2 animationParameter,float animationSpeedRate)
+    public void MoveAnimationBlend(Vector2 animationParameter,float animationSpeedRate)
     {
         if (animationParameter.magnitude < 0.1)
         {
             animationSpeedRate = 1.0f;
         }
-        playerAnimator.SetFloat("SpeedRate", animationSpeedRate);
-        playerAnimator.SetFloat("BlendX", animationParameter.x);
-        playerAnimator.SetFloat("BlendY", animationParameter.y);
+        m_playerAnimator.SetFloat("SpeedRate", animationSpeedRate);
+        m_playerAnimator.SetFloat("BlendX", animationParameter.x);
+        m_playerAnimator.SetFloat("BlendY", animationParameter.y);
     }
     
 
     public void PlayJumpUpAnimation()
     {
-        playerAnimator.SetBool("isJumpUp", true);
+        m_playerAnimator.SetBool("isJumpUp", true);
     }
 
     public void PlayJumpDownAnimation()
     {
-        playerAnimator.SetBool("isJumpDown", true);
+        m_playerAnimator.SetBool("isJumpDown", true);
     }
 
-    public void PlayJumpUpEnd()
+    //※アニメーションイベントで使用
+    public void StopJumpUpAnimation()
     {
-        playerAnimator.SetBool("isJumpUp", false);
-        isJumpUpEnd = true;
-        Debug.Log("isJumpUpEnd");
+        m_playerAnimator.SetBool("isJumpUp", false);
+        m_isJumpUpEnd = true;
     }
 
-    public void IsJumpDownEnd()
+    public void StopJumpDownAnimation()
     {
-        playerAnimator.SetBool("isJumpDown", false);
+        m_playerAnimator.SetBool("isJumpDown", false);
     }
 
     public bool GetIsJumpUpEnd()
     {
-        return isJumpUpEnd;
+        return m_isJumpUpEnd;
     }
 
     public void SetIsJumpUpEnd(bool jumpUpEnd)
     {
-        isJumpUpEnd = jumpUpEnd;
+        m_isJumpUpEnd = jumpUpEnd;
         
     }
 }

@@ -2534,14 +2534,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fabc446acec4a4e959bbb411198a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerAnimationManager: {fileID: 2131468709}
-  animator: {fileID: 2131468708}
-  moveSpeed: 7
-  moveSpeedRate: 0
-  jumpPower: 0.2
-  rayLength: 0.3
-  WeaponAttachParent: {fileID: 580987800}
-  scale: {x: 0.5, y: 0.5, z: 0.5}
+  m_playerAnimationManager: {fileID: 2131468709}
+  m_moveSpeed: 5
+  m_moveSpeedRate: 0
+  m_jumpPower: 0.5
+  m_rayLength: 0.2
+  m_weaponAttachParent: {fileID: 1721361330}
+  m_weaponScale: {x: 0.5, y: 0.5, z: 0.5}
 --- !u!65 &1386409179
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3740,6 +3739,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1229088656303266236, guid: 30dcfef955080b14a8e2608a4112d0c6, type: 3}
+      propertyPath: m_gravity
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 2280530026272935468, guid: 30dcfef955080b14a8e2608a4112d0c6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -3889,7 +3892,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52ef9b62a5920cf43bdf4a1d1361c88c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerAnimator: {fileID: 2131468708}
+  m_playerAnimator: {fileID: 2131468708}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
