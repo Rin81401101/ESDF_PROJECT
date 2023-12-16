@@ -110,6 +110,7 @@ public class Enemy : MonoBehaviour
         //次の座標地点に格納されている要素数分、繰り返す
         for (int i = 0; i < nextNodeObject.nextNodeObjList.Count; i++)
         {
+
             //一時リストに座標情報と座標間距離を格納
             tempNodeObjectList.Add(nextNodeObject);
             if (nextNodeObject.nextNodeObjList[i] != null)
@@ -130,17 +131,17 @@ public class Enemy : MonoBehaviour
                 //初回格納以降の場合、最短経路リストの更新を行う
                 else
                 {
-                    //最短経路リストと一時リストの要素数が一致しない場合、要素数を合わせる
-                    if (shortNodeObjectList.Count > tempNodeObjectList.Count)
-                    {
-                        //不足している要素数を算出、不足箇所に要素番号を最短経路リストから挿入
-                        int elementsToAdd = shortNodeObjectList.Count - tempNodeObjectList.Count;
+                    ////最短経路リストと一時リストの要素数が一致しない場合、要素数を合わせる
+                    //if (shortNodeObjectList.Count > tempNodeObjectList.Count)
+                    //{
+                    //    //不足している要素数を算出、不足箇所に要素番号を最短経路リストから挿入
+                    //    int elementsToAdd = shortNodeObjectList.Count - tempNodeObjectList.Count;
 
-                        for (int ii = 0; ii < elementsToAdd; ii++)
-                        {
-                            tempNodeObjectList.Insert(ii, shortNodeObjectList[ii]);
-                        }
-                    }
+                    //    for (int ii = 0; ii < elementsToAdd; ii++)
+                    //    {
+                    //        tempNodeObjectList.Insert(ii, shortNodeObjectList[ii]);
+                    //    }
+                    //}
                     //現在の座標間距離合計の方が距離が短い場合、最短座標間距離合計を更新する
                     if (shortNodePosDis > tempNodePosDis)
                     {
@@ -152,35 +153,38 @@ public class Enemy : MonoBehaviour
 
                 Debug.Log("経路一覧：" + string.Join(", ", tempNodeObjectList) + tempNodePosDis);
 
-                //一時リスト、座標間距離をクリア
-                tempNodeObjectList.Clear();
-                tempNodePosDis = 0;
+                //プレイヤー最寄経由地点のみを削除する
+                tempNodeObjectList.Remove(nextNodeObject);
+                tempNodePosDis -= Vector3.Distance(nextNodeObject.transform.position,
+                                    nextNodeObject.nextNodeObjList[i].transform.position);
+                ////一時リスト、座標間距離をクリア
+                //tempNodeObjectList.Clear();
+                //tempNodePosDis = 0;
+
+                return;
             }
 
             //次の移動座標を取得する
             Node temp = nextNodeObject.nextNodeObjList[i];
 
-            //最終地点の場合、処理を終了する
-            if (nextNodeObject.isPlayer)
-            {
-                return;
-            }
             //次の経由地点を取得できなかった場合、一時リスト、座標間距離を初期化して終了する
-            else if (temp == null)
+            if (temp == null)
             {
                 tempNodeObjectList.Clear();
                 tempNodePosDis = 0;
+
                 return;
             }
-
-            //このままだとisPlayerのノードまでぬけるよ
-            if (temp.isPlayer == true)
+            //
+            else if(!tempNodeObjectList.Contains(temp))
             {
-                return;
+                GetNextNode(temp);
             }
 
-            //再帰関数として実行
-            GetNextNode(temp);
+            //
+            tempNodeObjectList.Remove(nextNodeObject);
+            tempNodePosDis -= Vector3.Distance(nextNodeObject.transform.position,
+                    nextNodeObject.nextNodeObjList[i].transform.position);
         }
     }
     #endregion
