@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using DG.Tweening;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class PlayerManager : MonoBehaviour
     private PlayerInputAction playerInput;
 
     [Header("アニメーションマネージャー"), SerializeField]
-    private PlayerAnimationManager m_playerAnimationManager ;
+    private PlayerAnimationManager m_playerAnimationManager;
 
     private Rigidbody m_rb;
 
@@ -25,6 +26,7 @@ public class PlayerManager : MonoBehaviour
     private float m_jumpPower;
 
     private bool m_isRolling = false;
+    private Vector3 m_rollingVelocity = Vector3.zero;
 
     private bool m_isGroundTmp = false;
 
@@ -49,30 +51,28 @@ public class PlayerManager : MonoBehaviour
         m_weapon = WeaponManager.m_instance.AttachWeapon(m_weaponAttachParent, "Missile");
         m_weapon.gameObject.transform.localScale = m_weaponScale;
 
-        //回転軸　武器のベクトルと向けたい方向のベクトルで外積
+        //回転軸取得
         Vector3 rotateAxis = Vector3.Cross(m_weapon.gameObject.transform.forward, this.transform.forward);
-        Debug.Log(rotateAxis);
 
-        //回転角度 武器のベクトルと向けたい方向のベクトルで内積
+        //回転角度取得
         float rotateAngle = Vector3.Dot(m_weapon.gameObject.transform.forward, this.transform.forward);
-        Debug.Log(rotateAngle);
-
 
         //出した回転軸に回転角度を与える
-        m_weapon.gameObject.transform.rotation = Quaternion.AxisAngle(rotateAxis, rotateAngle);
+        m_weapon.gameObject.transform.rotation = Quaternion.AngleAxis(rotateAngle, rotateAxis);
     }
 
     private void OnEnable()
     {
+        //PlayerInputAction有効
         playerInput.Enable();
     }
 
     private void OnDisable()
     {
+        //PlayerInputAction無効
         playerInput.Disable();
     }
 
-    // Update is called once per frame
     void Update()
     {
         GravityManager.m_instance.gravityUpdate(m_rb);
@@ -97,7 +97,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// 移動処理
     /// </summary>
     private void Move()
     {
@@ -105,7 +105,7 @@ public class PlayerManager : MonoBehaviour
         Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
 
 
-        if (inputValue.sqrMagnitude != 0.0f)
+        if ((inputValue.sqrMagnitude != 0.0f) && !m_isRolling)
         {
             //プレイヤー移動アニメーション
             m_playerAnimationManager.MoveAnimationBlend(inputValue, inputValue.magnitude);
@@ -121,7 +121,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// 射撃/リロード処理
     /// </summary>
     private void Fire()
     {
@@ -139,7 +139,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// ジャンプ処理
     /// </summary>
     private void Jump()
     {
@@ -153,12 +153,7 @@ public class PlayerManager : MonoBehaviour
             //前後移動中またはジャンプ入力したらジャンプ
             if (playerInput.Player.Jump.triggered)
             {
-                //横移動中かつジャンプ入力したらローリング
-                if (Mathf.Abs(inputValue.x) > 0.2f)
-                {
-                    m_isRolling = true;
-                }
-                else
+                if (Mathf.Abs(inputValue.x) < 0.2f)
                 {
                     m_playerAnimationManager.PlayJumpUpAnimation();
                 }
@@ -183,39 +178,32 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// ローリング処理
     /// </summary>
     private void Rolling()
     {
-        if (m_isRolling)
+        //スティック入力取得
+        Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
+        if (playerInput.Player.Jump.triggered)
         {
-            Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
-
-            Vector3 velocity = new Vector3(
-                inputValue.x,
-                0.0f,
-                inputValue.y);
-
-            //ローリング加速
-            if (inputValue.x != 0.0f)
+            if (Mathf.Abs(inputValue.x) >= 0.2f && !m_isRolling)
             {
-                m_rb.AddForce(velocity * 10.0f, ForceMode.VelocityChange);
-                m_isRolling = false;
-            }
+                m_isRolling = true;
+                m_rollingVelocity = new Vector3(inputValue.x, 0.0f, inputValue.y);
+                m_playerAnimationManager.PlayRollingAnimation();
 
+            }
         }
     }
 
-
-
     /// <summary>
-    /// 
+    /// 地面着地判定
     /// </summary>
     /// <returns></returns>
     private bool isGrounded(bool isAnimation = false)
     {
         float lengthRate = 1.0f;
-        if(isAnimation)
+        if (isAnimation)
         {
             lengthRate = 2.0f;
         }
@@ -224,4 +212,32 @@ public class PlayerManager : MonoBehaviour
         Ray ray = new Ray(rayPos, Vector3.down);
         return Physics.Raycast(ray, m_rayLength * lengthRate);
     }
+
+    /// <summary>
+    /// リジッドボディ取得
+    /// </summary>
+    /// <returns></returns>
+    public Rigidbody GetRigidbody()
+    {
+        return m_rb;
+    }
+
+    /// <summary>
+    /// ローリング方向取得
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 GetRollingVelocity()
+    {
+        return m_rollingVelocity;
+    }
+
+    /// <summary>
+    /// ローリングフラグ設定
+    /// </summary>
+    /// <param name="flag"></param>
+    public void SetIsRolling(bool flag)
+    {
+        m_isRolling = flag;
+    }
+
 }
