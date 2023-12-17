@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using DG.Tweening;
 using UnityEngine.UI;
-using Cysharp.Threading.Tasks;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -36,11 +35,17 @@ public class PlayerManager : MonoBehaviour
     [Header("武器アタッチ箇所"), SerializeField]
     private GameObject m_weaponAttachParent;
 
-    private WeaponBase m_weapon;
+    private WeaponBase[] m_weapon = new WeaponBase[2];
     private WeaponUI m_weaponUI;
 
     [SerializeField]
     Vector3 m_weaponScale;
+
+    [SerializeField]
+    private List<string> m_weaponNames;
+
+    private int m_weaponIndex = 0;
+
 
     private void Awake()
     {
@@ -48,17 +53,10 @@ public class PlayerManager : MonoBehaviour
         m_rb = GetComponent<Rigidbody>();
         m_weaponUI = WeaponManager.m_instance.m_weaponUI.GetComponent<WeaponUI>();
 
-        m_weapon = WeaponManager.m_instance.AttachWeapon(m_weaponAttachParent, "Missile");
-        m_weapon.gameObject.transform.localScale = m_weaponScale;
-
-        //回転軸取得
-        Vector3 rotateAxis = Vector3.Cross(m_weapon.gameObject.transform.forward, this.transform.forward);
-
-        //回転角度取得
-        float rotateAngle = Vector3.Dot(m_weapon.gameObject.transform.forward, this.transform.forward);
-
-        //出した回転軸に回転角度を与える
-        m_weapon.gameObject.transform.rotation = Quaternion.AngleAxis(rotateAngle, rotateAxis);
+        m_weapon[0] = WeaponManager.m_instance.AttachWeapon(m_weaponAttachParent, m_weaponNames[0].ToString());
+        m_weapon[1] = WeaponManager.m_instance.AttachWeapon(m_weaponAttachParent, m_weaponNames[1].ToString());
+        m_weapon[1].gameObject.SetActive(false);
+        SetWeaponTransform(m_weaponIndex);
     }
 
     private void OnEnable()
@@ -77,8 +75,8 @@ public class PlayerManager : MonoBehaviour
     {
         GravityManager.m_instance.gravityUpdate(m_rb);
 
-        m_weaponUI.m_reloadUIMain.fillAmount = m_weapon.GetReloadRatio();
-        m_weaponUI.m_reloadUIParent.SetActive(m_weapon.GetIsReload());
+        m_weaponUI.m_reloadUIMain.fillAmount = m_weapon[m_weaponIndex].GetReloadRatio();
+        m_weaponUI.m_reloadUIParent.SetActive(m_weapon[m_weaponIndex].GetIsReload());
 
         //移動
         Move();
@@ -88,6 +86,9 @@ public class PlayerManager : MonoBehaviour
 
         //射撃
         Fire();
+
+        //武器切り替え
+        ChangeWeapon();
 
         //ローリング
         Rolling();
@@ -129,14 +130,41 @@ public class PlayerManager : MonoBehaviour
         //射撃判定(トリガー入力に余裕を持たせる)
         if (playerInput.Player.Fire.ReadValue<float>() > 0.3f)
         {
-            m_weapon.Shot();
+            m_weapon[m_weaponIndex].Shot();
         }
 
         if (playerInput.Player.Reload.triggered)
         {
-            m_weapon.Reload();
+            m_weapon[m_weaponIndex].Reload();
         }
     }
+
+    /// <summary>
+    /// 武器変更
+    /// </summary>
+    private void ChangeWeapon() {
+
+        if (playerInput.Player.WeaponChange.triggered)
+        {
+            //武器交換ボタンの値で武器を切り替える
+            if (m_weaponIndex != 0)
+            {
+                m_weapon[0].gameObject.SetActive(true);
+                m_weapon[1].gameObject.SetActive(false);
+                m_weaponIndex = 0;
+            }
+            else
+            {
+                m_weapon[0].gameObject.SetActive(false);
+                m_weapon[1].gameObject.SetActive(true);
+                m_weaponIndex = 1;
+            }
+
+            //武器のトランスフォーム設定
+            SetWeaponTransform(m_weaponIndex);
+        }
+    }
+
 
     /// <summary>
     /// ジャンプ処理
@@ -194,6 +222,20 @@ public class PlayerManager : MonoBehaviour
 
             }
         }
+    }
+
+    private void SetWeaponTransform(int m_index)
+    {
+        m_weapon[m_index].gameObject.transform.localScale = m_weaponScale;
+
+        //回転軸取得
+        Vector3 rotateAxis = Vector3.Cross(m_weapon[m_index].gameObject.transform.forward, this.transform.forward);
+
+        //回転角度取得
+        float rotateAngle = Vector3.Dot(m_weapon[m_index].gameObject.transform.forward, this.transform.forward);
+
+        //出した回転軸に回転角度を与える
+        m_weapon[m_index].gameObject.transform.rotation = Quaternion.AngleAxis(rotateAngle, rotateAxis);
     }
 
     /// <summary>
