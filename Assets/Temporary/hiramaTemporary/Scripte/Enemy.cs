@@ -30,30 +30,6 @@ public class Enemy : MonoBehaviour
     }
 
 
-    void Update()
-    {
-        #region
-        ////目的地点に移動
-        //transform.position = Vector3.MoveTowards(
-        //        transform.position,
-        //        new Vector3(nextNodeTransform.position.x,
-        //            nextNodeTransform.position.y,
-        //            nextNodeTransform.position.z),
-        //            speed * Time.deltaTime);
-
-        ////現在地点の座標差を計算
-        //float disNextPos = Vector3.Distance(transform.position, nextNodeTransform.position);
-
-        //// 次移動先ノードを更新
-        //if (disNextPos < tolLevPos)
-        //{
-        //    Node node = nextNodeTransform.GetComponent<Node>();
-        //    //nextNodeTransform = node.nextNodeTransform[0];
-        //}
-        #endregion
-    }
-
-
     #region 初回経由地点探索処理
     Node GetFirstNode()
     {
