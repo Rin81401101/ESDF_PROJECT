@@ -242,6 +242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   masterNodeObject: {fileID: 1234216156}
+  processIntervalTime: 1
   playerNodeObject: {fileID: 0}
   lastPlayerNode: {fileID: 0}
 --- !u!1 &479461015
@@ -1363,6 +1364,7 @@ GameObject:
   - component: {fileID: 1441000663}
   - component: {fileID: 1441000662}
   - component: {fileID: 1441000665}
+  - component: {fileID: 1441000666}
   m_Layer: 0
   m_Name: Cube_Enemy
   m_TagString: Untagged
@@ -1463,7 +1465,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1441000658}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcd8292f9de3b034b94d3909e59c52a7, type: 3}
   m_Name: 
@@ -1472,6 +1474,24 @@ MonoBehaviour:
   masterNodeObject: {fileID: 1234216156}
   detectionRange: Infinity
   firstNodeObject: {fileID: 0}
+--- !u!114 &1441000666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1441000658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90ee3cf7877aaad4e99f2946dac1e07b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerTransform: {fileID: 432518380}
+  masterNodeObject: {fileID: 1234216156}
+  detectionRange: Infinity
+  processIntervalTime: 1
+  enemyNodeObject: {fileID: 0}
+  lastEnemyNode: {fileID: 0}
 --- !u!1 &1545320660
 GameObject:
   m_ObjectHideFlags: 0

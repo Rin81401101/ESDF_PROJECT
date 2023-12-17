@@ -14,9 +14,9 @@ public class Player : MonoBehaviour
     [Header("前回のプレイヤー最寄経由地点"), HideInInspector] public Node lastPlayerNode = null;
 
 
-    private void Awake()
+    void Awake()
     {
-        StartCoroutine(GetPlayerNode());    //目標経由探索処理
+        StartCoroutine(GetPlayerNode());    //目標経由地点探索処理
     }
 
 
