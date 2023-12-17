@@ -26,7 +26,7 @@ public class Node : MonoBehaviour
     #region デバッグ機能
     void OnDrawGizmos()
     {
-        // 各、次の行先経由地点との赤線を描画
+        // 各行先経由地点間に赤線を描画
         Gizmos.color = Color.red;
 
         foreach (Node nextNode in nextNodeObjList)
