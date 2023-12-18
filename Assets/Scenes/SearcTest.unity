@@ -241,9 +241,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16af1760a2044b8438cf83937c1cfe5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  masterNodeObject: {fileID: 1234216156}
+  masterNodeObj: {fileID: 1234216156}
   processIntervalTime: 1
-  playerNodeObject: {fileID: 0}
+  playerNodeObj: {fileID: 0}
   lastPlayerNode: {fileID: 0}
 --- !u!1 &479461015
 GameObject:
@@ -1381,7 +1381,7 @@ Transform:
   m_GameObject: {fileID: 1441000658}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.51, y: 0.81, z: -2.93}
+  m_LocalPosition: {x: -1.34, y: 0.81, z: -2.83}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1487,11 +1487,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 432518380}
-  masterNodeObject: {fileID: 1234216156}
-  detectionRange: Infinity
+  masterNodeObj: {fileID: 1234216156}
   processIntervalTime: 1
-  enemyNodeObject: {fileID: 0}
-  lastEnemyNode: {fileID: 0}
 --- !u!1 &1545320660
 GameObject:
   m_ObjectHideFlags: 0
@@ -1592,7 +1589,7 @@ Transform:
   m_GameObject: {fileID: 1545320660}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.2773147, z: 0, w: 0.96077913}
-  m_LocalPosition: {x: 2.99, y: 1.65, z: -1.51}
+  m_LocalPosition: {x: 8.47, y: 1.65, z: -1.95}
   m_LocalScale: {x: 7.396438, y: 3.1494625, z: 0.6326}
   m_ConstrainProportionsScale: 0
   m_Children: []

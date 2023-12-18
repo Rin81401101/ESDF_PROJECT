@@ -42,8 +42,9 @@ public class Enemy_Ver2 : MonoBehaviour
     {
         while (true)
         {
-            Node nodeObject = GetFirstPos();    //初回地点取得
-            GetShortestRoute(nodeObject);       //最短経路ルート取得
+            ClearShortestRoute();             //前回最短経路初期化
+            Node nodeObject = GetFirstPos();  //初回地点取得
+            GetShortestRoute(nodeObject);     //最短経路ルート取得
 
             Debug.Log("最短経路：" + string.Join(", ", shortNodeObjList) + shortNodePosDis);
 
@@ -52,6 +53,13 @@ public class Enemy_Ver2 : MonoBehaviour
     }
     #endregion
 
+    #region 前回最短経路初期化
+    void ClearShortestRoute()
+    {
+        shortNodeObjList.Clear();
+        shortNodePosDis = 0f;
+    }
+    #endregion
 
     #region 初回地点取得
     Node GetFirstPos()
@@ -96,7 +104,6 @@ public class Enemy_Ver2 : MonoBehaviour
         return firstNodeObj;
     }
     #endregion
-
 
     #region 最短経路ルート取得
     void GetShortestRoute(Node nextNodeObj)
