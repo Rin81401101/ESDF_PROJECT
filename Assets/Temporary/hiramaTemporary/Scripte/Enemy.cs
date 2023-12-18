@@ -49,9 +49,9 @@ public class Enemy : MonoBehaviour
                 Node.NodePos tempNodePos = new Node.NodePos();
 
                 //子の経由地点と経由地点差（エネミー間）を取得
-                tempNodePos.nodeObject = masterNodeObject.gameObject.transform.GetChild(i).gameObject;
+                tempNodePos.nodeObj = masterNodeObject.gameObject.transform.GetChild(i).gameObject;
                 tempNodePos.nodePosDis = (Vector3.Distance(transform.position,
-                                                tempNodePos.nodeObject.gameObject.transform.position));
+                                                tempNodePos.nodeObj.gameObject.transform.position));
 
                 //初回は必ず保持
                 if (i == 0)
@@ -71,7 +71,7 @@ public class Enemy : MonoBehaviour
             }
 
             //目標地点から最も近い経由地点を取得
-            fIrstNoseObject = firstNodePosList[firstNodeNumMin].nodeObject.GetComponent<Node>();
+            fIrstNoseObject = firstNodePosList[firstNodeNumMin].nodeObj.GetComponent<Node>();
             Debug.Log("エネミー最寄経由地点：" + fIrstNoseObject);
         }
 
