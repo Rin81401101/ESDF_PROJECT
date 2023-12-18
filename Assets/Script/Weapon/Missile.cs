@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
 public class Missile : WeaponBase {
@@ -27,12 +28,12 @@ public class Missile : WeaponBase {
     private float m_lockOnInterval = 0.5f;
 
     List<GameObject> m_rangeInEnemyList = new List<GameObject>();//ロックオン範囲に入っている敵
-    List<GameObject> m_lockOnEnemyList= new List<GameObject>();//ロックオンが終わった敵
+    List<GameObject> m_lockOnEnemyList = new List<GameObject>();//ロックオンが終わった敵
     List<Image> m_lockOnImageList = new List<Image>();
     Vector2 m_lockOnRangeDefaultSize = new Vector2();
-    Image m_lockOnRangeUI;
-    private GameObject m_enemyParentObj;
-    private GameObject m_lockOnEnemy=null;//ロックオン中の敵
+    Image m_lockOnRangeUI = null;
+    private GameObject m_enemyParentObj = null;
+    private GameObject m_lockOnEnemy = null;//ロックオン中の敵
     private float m_reloadTimer = 0.05f;
     private float m_lockOnTimer = 0;
     private bool m_isReload = false;
@@ -59,10 +60,16 @@ public class Missile : WeaponBase {
             m_lockOnImageList.Add(img);
         }
     }
-  
+
     void Update() {
+        if (!m_isVaild) {
+            DisableLockOn();
+            return;
+        }
+
         if (m_isReload) {
             m_reloadTimer += Time.deltaTime;
+            DisableLockOn();
 
             //リロード完了
             if (GetReloadRatio() >= 1) {
@@ -104,9 +111,9 @@ public class Missile : WeaponBase {
         }
 
         //ロックオン中のエネミーの範囲内チェック
-        if(m_lockOnEnemy!=null) {
+        if (m_lockOnEnemy != null) {
             bool canLockOn = GetCanRockOn(m_lockOnEnemy.transform.position);
-            if(!canLockOn) {
+            if (!canLockOn) {
                 //ロックオン範囲外のエネミーをリストから削除
                 if (m_rangeInEnemyList.Contains(m_lockOnEnemy) == true) {
                     m_rangeInEnemyList.Remove(m_lockOnEnemy);
@@ -156,13 +163,20 @@ public class Missile : WeaponBase {
                 }
             }
         }
+
+        //UIを更新する
+        UpdateUI(lockOnCount);
+    }
+
+
+    private void UpdateUI(int lockOnCount) {
         //ロックオンしている敵のUIをONにする
-        for (int i=0; i< m_bulletMax; i++) {
+        for (int i = 0; i < m_bulletMax; i++) {
             if (i < m_lockOnEnemyList.Count) {
                 m_lockOnImageList[i].enabled = true;
                 m_lockOnImageList[i].rectTransform.position = GetScreenPos(m_lockOnEnemyList[i].transform.position);
             } else {
-                if((m_lockOnEnemy!=null&& lockOnCount==i)==false)
+                if ((m_lockOnEnemy != null && lockOnCount == i) == false)
                     m_lockOnImageList[i].enabled = false;
             }
         }
@@ -194,18 +208,25 @@ public class Missile : WeaponBase {
                 }
                 m_isReload = true;
                 m_reloadTimer = 0;
+                
             }
-            
+
         }
     }
 
     //ロックオン終了
     private void DisableLockOn() {
-        for (int i = 0; i < m_bulletMax; i++) {
-            m_lockOnImageList[i].enabled = false;
+        if (m_lockOnImageList.Count > 0) {
+            for (int i = 0; i < m_bulletMax; i++) {
+                m_lockOnImageList[i].enabled = false;
+            }
         }
-        m_lockOnRangeUI.enabled = false;
-        m_lockOnEnemy=null;
+
+        if (m_lockOnRangeUI != null) {
+            m_lockOnRangeUI.enabled = false;
+        }
+
+        m_lockOnEnemy = null;
         m_lockOnTimer = 0;
         m_lockOnEnemyList.Clear();
     }
@@ -221,7 +242,12 @@ public class Missile : WeaponBase {
         m_isReload = true;
         m_reloadTimer = 0;
 
-        DisableLockOn();
+
+    }
+
+    //スコープ
+    public override void ViewScope(bool isView) {
+        //NONE
     }
 
     //リロード中だったらtrue
@@ -235,6 +261,17 @@ public class Missile : WeaponBase {
         return m_reloadTimer / m_reloadTime;
     }
 
+
+    //有効化する
+    public override void SetVaild(bool isVaild) {
+        if (isVaild) {
+
+        } else {
+            DisableLockOn();
+        }
+        m_isVaild = isVaild;
+        m_visualObject.SetActive(isVaild);
+    }
 
     private bool GetCanRockOn(Vector3 pos) {
         Vector2 screenPosRatio = GetScreenPosRatio(pos);
