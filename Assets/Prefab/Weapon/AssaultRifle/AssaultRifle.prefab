@@ -46,11 +46,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f6602c00cafb3a43878fc68ec604c9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_visualObject: {fileID: 2904485260963667520}
   m_bullet: {fileID: 8131106867504713483, guid: 89458cc247d9fd746ac57cb067f7e7cd, type: 3}
   m_muzzleTransform: {fileID: 3175506727906890568}
+  m_reticleImage: {fileID: 4629751113021483280, guid: 9be92b9cf1589cd42ac23d2d4dc345b0, type: 3}
   m_reloadTime: 5
   m_shotInterval: 0.01
   m_bulletMax: 100
+  m_scopeRatio: 1
 --- !u!1 &6087517011819019737
 GameObject:
   m_ObjectHideFlags: 0
@@ -76,7 +79,7 @@ Transform:
   m_GameObject: {fileID: 6087517011819019737}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.169, z: 1.352}
+  m_LocalPosition: {x: 0, y: 0.224, z: 0.961}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -158,5 +161,10 @@ PrefabInstance:
 --- !u!4 &2523455431375357178 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 930b653073044e84f8a07d16af8f2ba9, type: 3}
+  m_PrefabInstance: {fileID: 2634504786645738257}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2904485260963667520 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 930b653073044e84f8a07d16af8f2ba9, type: 3}
   m_PrefabInstance: {fileID: 2634504786645738257}
   m_PrefabAsset: {fileID: 0}

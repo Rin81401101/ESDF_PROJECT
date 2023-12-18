@@ -45,7 +45,7 @@ public class PlayerManager : MonoBehaviour
     private List<string> m_weaponNames;
 
     private int m_weaponIndex = 0;
-
+    private bool m_isUsedScope = false;
 
     private void Awake()
     {
@@ -55,7 +55,7 @@ public class PlayerManager : MonoBehaviour
 
         m_weapon[0] = WeaponManager.m_instance.AttachWeapon(m_weaponAttachParent, m_weaponNames[0].ToString());
         m_weapon[1] = WeaponManager.m_instance.AttachWeapon(m_weaponAttachParent, m_weaponNames[1].ToString());
-        m_weapon[1].gameObject.SetActive(false);
+        m_weapon[1].SetVaild(false);
         SetWeaponTransform(m_weaponIndex);
     }
 
@@ -92,6 +92,12 @@ public class PlayerManager : MonoBehaviour
 
         //ローリング
         Rolling();
+
+        //武器のスコープをのぞく
+        if (Input.GetKeyDown(KeyCode.Q)) {
+            m_isUsedScope = !m_isUsedScope;
+            m_weapon[m_weaponIndex].ViewScope(m_isUsedScope);
+        }
 
         //横移動かつジャンプ→ローリング
         //前後移動またはジャンプ単体→ジャンプ
@@ -149,14 +155,14 @@ public class PlayerManager : MonoBehaviour
             //武器交換ボタンの値で武器を切り替える
             if (m_weaponIndex != 0)
             {
-                m_weapon[0].gameObject.SetActive(true);
-                m_weapon[1].gameObject.SetActive(false);
+                m_weapon[0].SetVaild(true);
+                m_weapon[1].SetVaild(false);
                 m_weaponIndex = 0;
             }
             else
             {
-                m_weapon[0].gameObject.SetActive(false);
-                m_weapon[1].gameObject.SetActive(true);
+                m_weapon[0].SetVaild(false);
+                m_weapon[1].SetVaild(true);
                 m_weaponIndex = 1;
             }
 
