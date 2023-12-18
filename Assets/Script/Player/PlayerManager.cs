@@ -94,13 +94,12 @@ public class PlayerManager : MonoBehaviour
         Rolling();
 
         //武器のスコープをのぞく
-        if (Input.GetKeyDown(KeyCode.Q)) {
+        if (playerInput.Player.Scope.triggered)
+        {
             m_isUsedScope = !m_isUsedScope;
             m_weapon[m_weaponIndex].ViewScope(m_isUsedScope);
-        }
 
-        //横移動かつジャンプ→ローリング
-        //前後移動またはジャンプ単体→ジャンプ
+        }
     }
 
     /// <summary>
