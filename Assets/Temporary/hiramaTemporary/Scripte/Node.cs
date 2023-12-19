@@ -7,7 +7,7 @@ public class Node : MonoBehaviour
 {
     public class NodePos    //経由地点クラス
     {
-        public GameObject nodeObj; //各経由地点情報
+        public GameObject nodeObj;    //各経由地点情報
         public float nodePosDis;      //各経由地点の座標間距離
     }
 
