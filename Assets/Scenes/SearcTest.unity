@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 432518382}
   - component: {fileID: 432518381}
   - component: {fileID: 432518384}
+  - component: {fileID: 432518385}
   m_Layer: 0
   m_Name: Cube_Player
   m_TagString: Player
@@ -245,6 +246,19 @@ MonoBehaviour:
   processIntervalTime: 1
   playerNodeObj: {fileID: 0}
   lastPlayerNode: {fileID: 0}
+--- !u!114 &432518385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432518379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 965c30f099b23f14bbe1b3e74be73e6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
 --- !u!1 &479461015
 GameObject:
   m_ObjectHideFlags: 0
@@ -1363,7 +1377,6 @@ GameObject:
   - component: {fileID: 1441000664}
   - component: {fileID: 1441000663}
   - component: {fileID: 1441000662}
-  - component: {fileID: 1441000665}
   - component: {fileID: 1441000666}
   m_Layer: 0
   m_Name: Cube_Enemy
@@ -1458,22 +1471,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1441000658}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1441000665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1441000658}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcd8292f9de3b034b94d3909e59c52a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerTransform: {fileID: 432518380}
-  masterNodeObject: {fileID: 1234216156}
-  detectionRange: Infinity
-  firstNodeObject: {fileID: 0}
 --- !u!114 &1441000666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1488,6 +1485,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 432518380}
   masterNodeObj: {fileID: 1234216156}
+  moveSpeed: 3
+  errorRange: 0.1
   processIntervalTime: 1
 --- !u!1 &1545320660
 GameObject:

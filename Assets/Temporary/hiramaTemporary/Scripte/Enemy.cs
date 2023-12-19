@@ -6,135 +6,183 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     List<Node.NodePos> firstNodePosList = new List<Node.NodePos>();    //初回の経由地点リスト
-    List<Node> shortNodeObjectList = new List<Node>(); //最短経由地点ルートリスト
-    List<Node> tempNodeObjectList = new List<Node>();  //一時経由地点ルートリスト
+    List<Node> shortNodeObjList = new List<Node>(); //最短経由地点ルートリスト
+    List<Node> tempNodeObjList = new List<Node>();  //一時経由地点ルートリスト
 
     [Header("目標地点"), SerializeField] Transform playerTransform;
-    [Header("親の経由地点情報"), SerializeField] GameObject masterNodeObject;
-    [Header("探知範囲"), SerializeField] float detectionRange = Mathf.Infinity;
-    //[Header("移動スピード"), SerializeField] float speed = 2f;
-    //[Header("座標の許容誤差値"), SerializeField] float tolLevPos = 0.01f;
+    [Header("親の経由地点情報"), SerializeField] GameObject masterNodeObj;
+    [Header("移動速度"), SerializeField] float moveSpeed = 3.0f;
+    [Header("距離の誤差範囲"), SerializeField] float errorRange = 0.1f;
+    [Header("処理間隔時間"), SerializeField] public float processIntervalTime = 1.0f;
 
-    [Header("初回の経由地点"), HideInInspector] public Node firstNodeObject;
     [Header("最短経由地点の座標差合計"), HideInInspector] float shortNodePosDis;
     [Header("一時経由地点の座標差合計"), HideInInspector] float tempNodePosDis;
-    //[Header("次の移動座標"), HideInInspector] Transform nextNodeTransform;
+    [Header("移動予定の経由地点番号"), HideInInspector] int currentTempNodeIndex;
+    [Header("移動中の経由地点"), HideInInspector] Node currentNode;
+    [Header("移動中の経由地点座標"), HideInInspector] Vector3 currentDis;
+    [Header("経由地点到達フラグ"), HideInInspector] bool arriveNode = false;
 
 
     void Start()
     {
-        firstNodeObject = GetFirstNode(); //初回経由地点探索処理
-        GetNextNode(firstNodeObject);     //経由地点ルート探索処理
-
-        Debug.Log("最短経路：" + string.Join(", ", shortNodeObjectList) + shortNodePosDis);
+        StartCoroutine(ShortestRouteSearch());     //最短経路探索処理
     }
 
-
-    #region 初回経由地点探索処理
-    Node GetFirstNode()
+    #region 最短経路探索処理
+    IEnumerator ShortestRouteSearch()
     {
-        Node fIrstNoseObject = null;  //経由地点情報
-        float firstNodePosDisMin = 0; //経由地点の最短座標間距離
-        int firstNodeNumMin = 0;      //経由地点の最短距離の要素番号
-
-        //目標地点にレイを飛ばし、
-        RaycastHit hit;
-
-        if (Physics.Raycast(transform.position, (playerTransform.position - transform.position), out hit, detectionRange))
+        while (true)
         {
-            //子の経由地点数分、繰り返す
-            for (int i = 0; i < masterNodeObject.gameObject.transform.childCount; i++)
-            {
-                //各経由地点情報と座標間距離を取得
-                Node.NodePos tempNodePos = new Node.NodePos();
+            ClearShortestRoute();             //前回最短経路初期化
+            Node nodeObject = GetFirstPos();  //初回地点取得
+            GetShortestRoute(nodeObject);     //最短経路ルート取得
 
-                //子の経由地点と経由地点差（エネミー間）を取得
-                tempNodePos.nodeObj = masterNodeObject.gameObject.transform.GetChild(i).gameObject;
-                tempNodePos.nodePosDis = (Vector3.Distance(transform.position,
-                                                tempNodePos.nodeObj.gameObject.transform.position));
+            Debug.Log("最短経路：" + string.Join(", ", shortNodeObjList) + shortNodePosDis);
 
-                //初回は必ず保持
-                if (i == 0)
-                {
-                    firstNodePosDisMin = tempNodePos.nodePosDis;
-                    firstNodeNumMin = i;
-                }
-                //以降は座標間距離を比較、距離が短い方に更新
-                else if (firstNodePosDisMin > tempNodePos.nodePosDis)
-                {
-                    firstNodePosDisMin = tempNodePos.nodePosDis;
-                    firstNodeNumMin = i;
-                }
-
-                //座標情報、座標間距離の組合せをリストに格納
-                firstNodePosList.Add(tempNodePos);
-            }
-
-            //目標地点から最も近い経由地点を取得
-            fIrstNoseObject = firstNodePosList[firstNodeNumMin].nodeObj.GetComponent<Node>();
-            Debug.Log("エネミー最寄経由地点：" + fIrstNoseObject);
+            yield return new WaitForSeconds(processIntervalTime);
         }
-
-        return fIrstNoseObject;
     }
     #endregion
 
-
-    #region 経由地点ルート探索処理
-    void GetNextNode(Node nextNodeObject)
+    #region 前回最短経路初期化
+    void ClearShortestRoute()
     {
-        //次の行先経由地点数分、処理を繰り返す
-        for (int i = 0; i < nextNodeObject.nextNodeObjList.Count; i++)
-        {
-            //一時リストに座標情報と座標間距離を格納
-            tempNodeObjectList.Add(nextNodeObject);
+        shortNodeObjList.Clear();
+        shortNodePosDis = 0f;
+        currentTempNodeIndex = 0;
+    }
+    #endregion
 
-            if (nextNodeObject.nextNodeObjList[i] != null)
+    #region 初回地点取得
+    Node GetFirstPos()
+    {
+        Node firstNodeObj = null;    //経由地点情報
+
+        float firstNodePosDisMin = 0;   //経由地点の最短座標間距離
+        int firstNodeNumMin = 0;        //経由地点の最短距離の要素番号
+
+        //子の経由地点数分、繰り返す
+        for (int i = 0; i < masterNodeObj.gameObject.transform.childCount; i++)
+        {
+            Node.NodePos tempNodePos = new Node.NodePos();
+
+            //各経由地点情報と座標間距離を取得
+            tempNodePos.nodeObj = masterNodeObj.gameObject.transform.GetChild(i).gameObject;
+
+            Vector3 tempNodePosDis = tempNodePos.nodeObj.gameObject.transform.position;
+            tempNodePos.nodePosDis = (Vector3.Distance(transform.position, tempNodePosDis));
+
+            //初回は必ず保持
+            if (i == 0)
             {
-                tempNodePosDis += Vector3.Distance(nextNodeObject.transform.position,
-                                                    nextNodeObject.nextNodeObjList[i].transform.position);
+                firstNodePosDisMin = tempNodePos.nodePosDis;
+                firstNodeNumMin = i;
+            }
+            //以降は座標間距離を比較、距離が短い方に更新
+            else if (firstNodePosDisMin > tempNodePos.nodePosDis)
+            {
+                firstNodePosDisMin = tempNodePos.nodePosDis;
+                firstNodeNumMin = i;
             }
 
-            //最終地点の場合、最短経路リストとの比較、更新を行う
-            if (nextNodeObject.isPlayer)
+            //座標情報、座標間距離の組合せをリストに格納
+            firstNodePosList.Add(tempNodePos);
+        }
+
+        //目標地点から最も近い経由地点を取得
+        firstNodeObj = firstNodePosList[firstNodeNumMin].nodeObj.GetComponent<Node>();
+        //Debug.Log("エネミー最寄経由地点：" + firstNodeObj);
+
+        return firstNodeObj;
+    }
+    #endregion
+
+    #region 最短経路ルート取得
+    void GetShortestRoute(Node nextNodeObj)
+    {
+        //次の行先経由地点数分、処理を繰り返す
+        for (int i = 0; i < nextNodeObj.nextNodeObjList.Count; i++)
+        {
+            //一時リストに座標と座標差を格納する
+            tempNodeObjList.Add(nextNodeObj);
+
+            Vector3 nextNodePosDis = nextNodeObj.nextNodeObjList[i].transform.position;
+            if (nextNodeObj.nextNodeObjList[i] != null)
             {
-                //最短経路リストが空の場合、初回格納を行う
-                if (shortNodeObjectList.Count == 0)
+                tempNodePosDis += (Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis));
+            }
+
+            //プレイヤーの最寄経由地点まで格納した場合、
+            if (nextNodeObj.isPlayer)
+            {
+                //初回の場合、最短経路として格納する
+                if (shortNodeObjList.Count == 0)
                 {
-                    shortNodeObjectList.AddRange(tempNodeObjectList);
+                    shortNodeObjList.AddRange(tempNodeObjList);
                     shortNodePosDis = tempNodePosDis;
                 }
-                //初回格納以降の場合、座標間距離の比較し、最短経路リストの更新を行う
+                //以降の場合、最短経路と一時リストを比較、更新を行う
                 else if (shortNodePosDis > tempNodePosDis)
                 {
-                    shortNodeObjectList.Clear();
-                    shortNodeObjectList.AddRange(tempNodeObjectList);
+                    shortNodeObjList.Clear();
+                    shortNodeObjList.AddRange(tempNodeObjList);
                     shortNodePosDis = tempNodePosDis;
                 }
 
-                Debug.Log("経路一覧：" + string.Join(", ", tempNodeObjectList) + tempNodePosDis);
+                //Debug.Log("経路一覧：" + string.Join(", ", tempNodeObjList) + tempNodePosDis);
 
-                //プレイヤー最寄経由地点を削除する
-                tempNodeObjectList.Remove(nextNodeObject);
-                tempNodePosDis -= Vector3.Distance(nextNodeObject.transform.position,
-                                    nextNodeObject.nextNodeObjList[i].transform.position);
+                //プレイヤーの最寄経由地点データを削除する
+                tempNodeObjList.Remove(nextNodeObj);
+                tempNodePosDis -= (Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis));
 
                 return;
             }
 
-            //次の行先経由地点を取得する
-            Node temp = nextNodeObject.nextNodeObjList[i];
+            //次の行先経由地点を仮取得する
+            Node tempNodeObj = nextNodeObj.nextNodeObjList[i];
 
-            //一時リスト内に次の行先経由地点がない場合、行先経由地点でのルート探索を行う
-            if (!tempNodeObjectList.Contains(temp))
+            //取得データが一時リスト内に無い場合、再帰関数で次の経由地点情報の階層に移る
+            if (!tempNodeObjList.Contains(tempNodeObj))
             {
-                GetNextNode(temp);
+                GetShortestRoute(tempNodeObj);
             }
 
             //探索済み、または、他の行先経由地点の再読込のため、削除する
-            tempNodeObjectList.Remove(nextNodeObject);
-            tempNodePosDis -= Vector3.Distance(nextNodeObject.transform.position,
-                                                nextNodeObject.nextNodeObjList[i].transform.position);
+            tempNodeObjList.Remove(nextNodeObj);
+            tempNodePosDis -= Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis);
+        }
+    }
+    #endregion
+
+
+    void Update()
+    {
+        MoveShortestRoute();    //最短経路移動処理
+    }
+
+    #region 最短経路移動処理
+    void MoveShortestRoute()
+    {
+        if (currentTempNodeIndex < shortNodeObjList.Count)
+        {
+            //現在の経由地点に到達するまで、経由地点を更新しない
+            if (!arriveNode)
+            {
+                //現在の移動先経由地点と移動方向を取得する
+                currentNode = shortNodeObjList[currentTempNodeIndex];
+                currentDis = (currentNode.transform.position - transform.position).normalized;
+                arriveNode = true;
+            }
+
+            //現在の移動先経由地点に移動する
+            transform.Translate(currentDis * moveSpeed * Time.deltaTime);
+
+            //現在の経由地点に到達した場合、次の移動先経由地点を設定
+            if (Vector3.Distance(transform.position, currentNode.transform.position) < errorRange)
+            {
+                arriveNode = false;
+                currentTempNodeIndex++;
+            }
         }
     }
     #endregion
