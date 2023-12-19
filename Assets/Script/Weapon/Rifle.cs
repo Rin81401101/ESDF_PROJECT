@@ -35,7 +35,7 @@ public class Rifle : WeaponBase {
     private bool m_canShot = true;
     private bool m_isReload = false;
 
-    private void Start() {
+    private void Awake() {
         m_bulletNum = m_bulletMax;
         m_reloadTimer= m_reloadTime;
 
@@ -105,6 +105,11 @@ public class Rifle : WeaponBase {
         } else {
             Camera.main.fieldOfView = fieldOfViewBase;
         }
+    }
+
+    public override void FinalizeDestroy() {
+        Destroy(m_reticleUI.gameObject);
+        Destroy(this.gameObject);
     }
 
     //ÉäÉçÅ[ÉhíÜÇæÇ¡ÇΩÇÁtrue

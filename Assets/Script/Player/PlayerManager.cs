@@ -58,7 +58,7 @@ public class PlayerManager : MonoBehaviour
         m_weapon[1].SetVaild(false);
         SetWeaponTransform(m_weaponIndex);
     }
-
+  
     private void OnEnable()
     {
         //PlayerInputAction—LŒø
@@ -287,4 +287,16 @@ public class PlayerManager : MonoBehaviour
         m_isRolling = flag;
     }
 
+    public WeaponBase GetWeapon(int index) {
+        return m_weapon[index];
+    }
+
+    public int GetWeaponIndex() {
+        return m_weaponIndex;
+    }
+
+    public void SetWeapon(string weaponName, int index) {
+        m_weapon[index] = WeaponManager.m_instance.AttachWeapon(m_weaponAttachParent, weaponName);
+        SetWeaponTransform(index);
+    }
 }
