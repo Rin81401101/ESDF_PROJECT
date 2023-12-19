@@ -113,4 +113,8 @@ public class WeaponManager : MonoBehaviour {
         return null;
     }
 
+    public Dictionary<string, List<GameObject>> GetWeaponList() {
+        return m_weaponList;
+    }
+
 }

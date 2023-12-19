@@ -11,6 +11,7 @@ public abstract class WeaponBase : MonoBehaviour
     public abstract void Shot();
     public abstract void Reload();
     public abstract void ViewScope(bool isView);
+    public abstract void FinalizeDestroy();
     public abstract bool GetIsReload();
     public abstract float GetReloadRatio();
 

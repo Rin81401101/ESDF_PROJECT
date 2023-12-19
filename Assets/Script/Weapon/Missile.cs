@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public class Missile : WeaponBase {
     [SerializeField]
@@ -248,6 +249,14 @@ public class Missile : WeaponBase {
     //スコープ
     public override void ViewScope(bool isView) {
         //NONE
+    }
+
+    public override void FinalizeDestroy() {
+        foreach(var item in m_lockOnImageList){
+            Destroy(item.gameObject);
+        }
+        Destroy(m_lockOnRangeUI.gameObject);
+        Destroy(this.gameObject);
     }
 
     //リロード中だったらtrue
