@@ -9,20 +9,22 @@ public class EnemyLockOnUI : MonoBehaviour
         SEARCH,
         LOCKON
     }
-    Vector2 defaultScale = Vector2.one;
-    Image img;
+
+    [SerializeField]
+    private Image m_lockOnImage = null;
+
+
     private void Start() {
-        img = GetComponent<Image>();
-        defaultScale = img.rectTransform.sizeDelta;
+
     }
 
     public void SetLockOnState(LockOnState state) {
         switch(state) {
             case LockOnState.SEARCH:
-                img.rectTransform.sizeDelta = defaultScale * 0.5f;
+                m_lockOnImage.rectTransform.sizeDelta = Vector2.one*25;
                 break;
             case LockOnState.LOCKON:
-                img.rectTransform.sizeDelta = defaultScale;
+                m_lockOnImage.rectTransform.sizeDelta = Vector2.one*50;
                 break;
         }
     }

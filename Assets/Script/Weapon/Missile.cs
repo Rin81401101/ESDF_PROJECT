@@ -57,7 +57,7 @@ public class Missile : WeaponBase {
         //敵のロックオンUIを生成する
         for (int i = 0; i < m_bulletMax; i++) {
             Image img = Instantiate(m_lockOnImage, weaponUI.m_lockOnUIParent.transform);
-            img.enabled = false;
+            img.gameObject.SetActive(false);
             m_lockOnImageList.Add(img);
         }
     }
@@ -154,7 +154,7 @@ public class Missile : WeaponBase {
                 m_lockOnTimer += Time.deltaTime;
 
                 //interval中もUIをOnにする
-                m_lockOnImageList[lockOnCount].enabled = true;
+                m_lockOnImageList[lockOnCount].gameObject.SetActive(true);
                 m_lockOnImageList[lockOnCount].rectTransform.position = GetScreenPos(m_lockOnEnemy.transform.position);
 
                 if (m_lockOnTimer > m_lockOnInterval && m_bulletMax > m_lockOnEnemyList.Count) {
@@ -174,7 +174,7 @@ public class Missile : WeaponBase {
         //ロックオンしている敵のUIをONにする
         for (int i = 0; i < m_bulletMax; i++) {
             if (i < m_lockOnEnemyList.Count) {
-                m_lockOnImageList[i].enabled = true;
+                m_lockOnImageList[i].gameObject.SetActive(true);
                 m_lockOnImageList[i].rectTransform.position = GetScreenPos(m_lockOnEnemyList[i].transform.position);
             } else {
                 if ((m_lockOnEnemy != null && lockOnCount == i) == false)
@@ -191,7 +191,7 @@ public class Missile : WeaponBase {
         //ロックオンしている敵がいるか
         bool canShot = false;
         for (int i = 0; i < m_lockOnImageList.Count; i++) {
-            if (m_lockOnImageList[i].enabled) {
+            if (m_lockOnImageList[i].gameObject.activeSelf) {
                 canShot = true;
                 break;
             }
@@ -219,7 +219,7 @@ public class Missile : WeaponBase {
     private void DisableLockOn() {
         if (m_lockOnImageList.Count > 0) {
             for (int i = 0; i < m_bulletMax; i++) {
-                m_lockOnImageList[i].enabled = false;
+                m_lockOnImageList[i].gameObject.SetActive(false);
             }
         }
 
