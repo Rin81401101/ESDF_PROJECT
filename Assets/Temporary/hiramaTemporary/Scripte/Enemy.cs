@@ -12,6 +12,7 @@ public class Enemy : MonoBehaviour
     [Header("目標地点"), SerializeField] Transform m_playerTransform;
     [Header("親の経由地点情報"), SerializeField] GameObject m_masterNodeObj;
     [Header("移動速度"), SerializeField] float m_moveSpeed = 3.0f;
+    [Header("プレイヤーの探知範囲"), SerializeField] float detectionRange = 100.0f;
     [Header("距離の誤差範囲"), SerializeField] float m_errorRange = 0.1f;
     [Header("処理間隔時間"), SerializeField] public float m_processIntervalTime = 1.0f;
 
@@ -36,8 +37,7 @@ public class Enemy : MonoBehaviour
             ClearShortestRoute();             //前回最短経路初期化
             Node nodeObject = GetFirstPos();  //初回地点取得
             GetShortestRoute(nodeObject);     //最短経路ルート取得
-
-            Debug.Log("最短経路：" + string.Join(", ", m_shortNodeObjList) + m_shortNodePosDis);
+            //Debug.Log("最短経路：" + string.Join(", ", m_shortNodeObjList) + m_shortNodePosDis);
 
             yield return new WaitForSeconds(m_processIntervalTime);
         }
@@ -56,41 +56,54 @@ public class Enemy : MonoBehaviour
     #region 初回地点取得
     Node GetFirstPos()
     {
-        Node firstNodeObj = null;    //経由地点情報
-
+        Node firstNodeObj = null;       //経由地点情報
         float firstNodePosDisMin = 0;   //経由地点の最短座標間距離
         int firstNodeNumMin = 0;        //経由地点の最短距離の要素番号
 
-        //子の経由地点数分、繰り返す
-        for (int i = 0; i < m_masterNodeObj.gameObject.transform.childCount; i++)
+        if (Physics.Raycast(transform.position, (m_playerTransform.position - transform.position), out RaycastHit hit, detectionRange))
         {
-            Node.NodePos tempNodePos = new Node.NodePos();
-
-            //各経由地点情報と座標間距離を取得
-            tempNodePos.nodeObj = m_masterNodeObj.gameObject.transform.GetChild(i).gameObject;
-
-            Vector3 tempNodePosDis = tempNodePos.nodeObj.gameObject.transform.position;
-            tempNodePos.nodePosDis = (Vector3.Distance(transform.position, tempNodePosDis));
-
-            //初回は必ず保持
-            if (i == 0)
+            //プレイヤーを視認した場合、
+            if (hit.collider.CompareTag("Player"))
             {
-                firstNodePosDisMin = tempNodePos.nodePosDis;
-                firstNodeNumMin = i;
+                Debug.Log("プレイヤー判定");
             }
-            //以降は座標間距離を比較、距離が短い方に更新
-            else if (firstNodePosDisMin > tempNodePos.nodePosDis)
+            //プレイヤーを視認できなかった場合、
+            else
             {
-                firstNodePosDisMin = tempNodePos.nodePosDis;
-                firstNodeNumMin = i;
-            }
+                //子の経由地点数分、繰り返す
+                for (int i = 0; i < m_masterNodeObj.gameObject.transform.childCount; i++)
+                {
+                    Node.NodePos tempNodePos = new Node.NodePos();
 
-            //座標情報、座標間距離の組合せをリストに格納
-            m_firstNodePosList.Add(tempNodePos);
+                    //各経由地点情報と座標間距離を取得
+                    tempNodePos.nodeObj = m_masterNodeObj.gameObject.transform.GetChild(i).gameObject;
+
+                    Vector3 tempNodePosDis = tempNodePos.nodeObj.gameObject.transform.position;
+                    tempNodePos.nodePosDis = (Vector3.Distance(transform.position, tempNodePosDis));
+
+                    //初回は必ず保持
+                    if (i == 0)
+                    {
+                        firstNodePosDisMin = tempNodePos.nodePosDis;
+                        firstNodeNumMin = i;
+                    }
+                    //以降は座標間距離を比較、距離が短い方に更新
+                    else if (firstNodePosDisMin > tempNodePos.nodePosDis)
+                    {
+                        firstNodePosDisMin = tempNodePos.nodePosDis;
+                        firstNodeNumMin = i;
+                    }
+
+                    //座標情報、座標間距離の組合せをリストに格納
+                    m_firstNodePosList.Add(tempNodePos);
+                }
+
+                //自身から最も近い経由地点を取得
+                firstNodeObj = m_firstNodePosList[firstNodeNumMin].nodeObj.GetComponent<Node>();
+                Debug.Log("障害物判定");
+            }
         }
 
-        //目標地点から最も近い経由地点を取得
-        firstNodeObj = m_firstNodePosList[firstNodeNumMin].nodeObj.GetComponent<Node>();
         //Debug.Log("エネミー最寄経由地点：" + firstNodeObj);
 
         return firstNodeObj;
@@ -184,6 +197,19 @@ public class Enemy : MonoBehaviour
                 m_currentTempNodeIndex++;
             }
         }
+    }
+    #endregion
+
+
+    #region デバッグ機能
+    void OnDrawGizmos()
+    {
+        //プレイヤー（レイキャスト）に向かって青線を描画 
+        Gizmos.color = Color.blue;
+
+        Vector3 rayStart = transform.position;
+        Vector3 rayDirection = (m_playerTransform.position - transform.position).normalized;
+        Gizmos.DrawRay(rayStart, rayDirection * detectionRange);
     }
     #endregion
 }
