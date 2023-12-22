@@ -74,6 +74,7 @@ public class Player : MonoBehaviour
             {
                 m_playerNodeObj.m_isPlayer = true;
                 m_lastPlayerNode = m_playerNodeObj;
+
                 //Debug.Log("プレイヤー最寄経由地点：" + playerNodeObj);
             }
 
