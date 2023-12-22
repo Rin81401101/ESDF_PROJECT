@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class PlayerManager : MonoBehaviour
 {
     //入力管理
-    private PlayerInputAction playerInput;
+    private PlayerInputAction m_playerInput;
 
     [Header("アニメーションマネージャー"), SerializeField]
     private PlayerAnimationManager m_playerAnimationManager;
@@ -49,7 +49,7 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
-        playerInput = new PlayerInputAction();
+        m_playerInput = new PlayerInputAction();
         m_rb = GetComponent<Rigidbody>();
         m_weaponUI = WeaponManager.m_instance.m_weaponUI.GetComponent<WeaponUI>();
 
@@ -62,13 +62,13 @@ public class PlayerManager : MonoBehaviour
     private void OnEnable()
     {
         //PlayerInputAction有効
-        playerInput.Enable();
+        m_playerInput.Enable();
     }
 
     private void OnDisable()
     {
         //PlayerInputAction無効
-        playerInput.Disable();
+        m_playerInput.Disable();
     }
 
     void Update()
@@ -94,7 +94,7 @@ public class PlayerManager : MonoBehaviour
         Rolling();
 
         //武器のスコープをのぞく
-        if (playerInput.Player.Scope.triggered)
+        if (m_playerInput.Player.Scope.triggered)
         {
             m_isUsedScope = !m_isUsedScope;
             m_weapon[m_weaponIndex].ViewScope(m_isUsedScope);
@@ -108,7 +108,7 @@ public class PlayerManager : MonoBehaviour
     private void Move()
     {
         //スティック入力取得
-        Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
+        Vector2 inputValue = m_playerInput.Player.Move.ReadValue<Vector2>();
 
 
         if ((inputValue.sqrMagnitude != 0.0f) && !m_isRolling)
@@ -133,12 +133,12 @@ public class PlayerManager : MonoBehaviour
     {
 
         //射撃判定(トリガー入力に余裕を持たせる)
-        if (playerInput.Player.Fire.ReadValue<float>() > 0.3f)
+        if (m_playerInput.Player.Fire.ReadValue<float>() > 0.3f)
         {
             m_weapon[m_weaponIndex].Shot();
         }
 
-        if (playerInput.Player.Reload.triggered)
+        if (m_playerInput.Player.Reload.triggered)
         {
             m_weapon[m_weaponIndex].Reload();
         }
@@ -149,7 +149,7 @@ public class PlayerManager : MonoBehaviour
     /// </summary>
     private void ChangeWeapon() {
 
-        if (playerInput.Player.WeaponChange.triggered)
+        if (m_playerInput.Player.WeaponChange.triggered)
         {
             //武器交換ボタンの値で武器を切り替える
             if (m_weaponIndex != 0)
@@ -180,11 +180,11 @@ public class PlayerManager : MonoBehaviour
         if (isGrounded())
         {
             //スティック入力取得
-            Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
+            Vector2 inputValue = m_playerInput.Player.Move.ReadValue<Vector2>();
             m_moveSpeedRate = 1.0f;
 
             //前後移動中またはジャンプ入力したらジャンプ
-            if (playerInput.Player.Jump.triggered)
+            if (m_playerInput.Player.Jump.triggered)
             {
                 if (Mathf.Abs(inputValue.x) < 0.2f)
                 {
@@ -216,8 +216,8 @@ public class PlayerManager : MonoBehaviour
     private void Rolling()
     {
         //スティック入力取得
-        Vector2 inputValue = playerInput.Player.Move.ReadValue<Vector2>();
-        if (playerInput.Player.Jump.triggered)
+        Vector2 inputValue = m_playerInput.Player.Move.ReadValue<Vector2>();
+        if (m_playerInput.Player.Jump.triggered && isGrounded())
         {
             if (Mathf.Abs(inputValue.x) >= 0.2f && !m_isRolling)
             {
@@ -258,6 +258,12 @@ public class PlayerManager : MonoBehaviour
         Vector3 rayPos = transform.position + new Vector3(0.0f, +0.1f, 0.0f);
         Ray ray = new Ray(rayPos, Vector3.down);
         return Physics.Raycast(ray, m_rayLength * lengthRate);
+    }
+
+
+    public PlayerInputAction getPlayerInputAction()
+    {
+        return m_playerInput;
     }
 
     /// <summary>
