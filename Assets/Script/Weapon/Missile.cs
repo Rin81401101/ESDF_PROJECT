@@ -178,7 +178,7 @@ public class Missile : WeaponBase {
                 m_lockOnImageList[i].rectTransform.position = GetScreenPos(m_lockOnEnemyList[i].transform.position);
             } else {
                 if ((m_lockOnEnemy != null && lockOnCount == i) == false)
-                    m_lockOnImageList[i].enabled = false;
+                    m_lockOnImageList[i].gameObject.SetActive(false);
             }
         }
 
