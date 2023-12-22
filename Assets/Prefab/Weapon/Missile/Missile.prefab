@@ -65,7 +65,7 @@ MonoBehaviour:
   m_lockOnRangeRatio: 0.7
   m_rotationSpeedRatio: 0.05
   m_moveSpeed: 25
-  m_lockOnInterval: 0.1
+  m_lockOnInterval: 0.5
 --- !u!1 &4761794582577353221
 GameObject:
   m_ObjectHideFlags: 0
