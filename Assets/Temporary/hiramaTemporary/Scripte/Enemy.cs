@@ -37,6 +37,7 @@ public class Enemy : MonoBehaviour
             ClearShortestRoute();             //前回最短経路初期化
             Node nodeObject = GetFirstPos();  //初回地点取得
             GetShortestRoute(nodeObject);     //最短経路ルート取得
+
             //Debug.Log("最短経路：" + string.Join(", ", m_shortNodeObjList) + m_shortNodePosDis);
 
             yield return new WaitForSeconds(m_processIntervalTime);
@@ -65,7 +66,11 @@ public class Enemy : MonoBehaviour
             //プレイヤーを視認した場合、
             if (hit.collider.CompareTag("Player"))
             {
-                Debug.Log("プレイヤー判定");
+                //プレイヤーから最も近い経由地点を取得
+                GameObject playerNodeObj = GameObject.FindWithTag("Player");
+                firstNodeObj = playerNodeObj.GetComponent<Player>().m_playerNodeObj;
+
+                //Debug.Log("プレイヤー判定");
             }
             //プレイヤーを視認できなかった場合、
             else
@@ -100,7 +105,8 @@ public class Enemy : MonoBehaviour
 
                 //自身から最も近い経由地点を取得
                 firstNodeObj = m_firstNodePosList[firstNodeNumMin].nodeObj.GetComponent<Node>();
-                Debug.Log("障害物判定");
+
+                //Debug.Log("障害物判定");
             }
         }
 
