@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 3486847117734990819}
   - component: {fileID: 2030032415716601130}
   - component: {fileID: 3771585301349797789}
-  m_Layer: 0
+  - component: {fileID: -3268502511371728099}
+  m_Layer: 4
   m_Name: LaserBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,3 +151,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_lineRenderer: {fileID: 2030032415716601130}
+  duration: 0.4
+--- !u!114 &-3268502511371728099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141008750119398634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sharedProfile: {fileID: 11400000, guid: 5bde0cc136fc38c4db4c23a938daaaab, type: 2}
+  isGlobal: 1
+  blendDistance: 0
+  weight: 1
+  priority: 0
