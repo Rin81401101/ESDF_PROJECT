@@ -15,11 +15,14 @@ public class PlayerAnimationManager : MonoBehaviour
 
     private PlayerManager m_playerManager;
 
+    private PlayerInputAction m_inputAciton;
+
     private Rigidbody m_rb;
 
     public void Awake()
     {
         m_playerManager = transform.parent.GetComponent<PlayerManager>();
+        m_inputAciton = m_playerManager.getPlayerInputAction();
         m_rb = m_playerManager.GetRigidbody();
     }
 
@@ -141,5 +144,12 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         m_isJumpUpEnd = jumpUpEnd;
         
+    }
+
+    public void OnAnimatorIK(int layerIndex)
+    {
+        Vector3 value = m_inputAciton.Player.Aim.ReadValue<Vector2>() * 10.0f;
+        m_playerAnimator.SetLookAtWeight(1.0f, 0.8f, 1.0f, 0.0f, 0.0f);
+        m_playerAnimator.SetLookAtPosition(new Vector3(value.x, value.y, 10.0f));
     }
 }
