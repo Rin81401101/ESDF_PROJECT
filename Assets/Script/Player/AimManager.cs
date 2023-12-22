@@ -41,6 +41,7 @@ public class AimManager : MonoBehaviour
 
         Vector3 aa = new Vector3();
         Vector3 newRight = m_spineTransform.right - m_defaultRight + Vector3.right;
+        newRight.y = 0;
         aa = Vector3.up * m_value + newRight.normalized * m_value2;
 
         Vector2 vec = new Vector2(m_value, m_value2);

@@ -26,7 +26,9 @@ public class LaserBullet : MonoBehaviour
                 m_lineRenderer.endWidth = m_width;
             }
             );
+        Destroy(this.gameObject, 0.3f);
     }
+
 
 
 
