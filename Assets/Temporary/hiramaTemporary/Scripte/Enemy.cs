@@ -13,9 +13,10 @@ public class Enemy : MonoBehaviour
     [Header("親の経由地点情報"), SerializeField] GameObject m_masterNodeObj;
     [Header("移動速度"), SerializeField] float m_moveSpeed = 3.0f;
     [Header("探索範囲"), SerializeField] float m_detectionRange = 50.0f;
-    [Header("探索高度"), SerializeField] float m_detectionHeight = 5.0f;
+    [Header("探索高度"), SerializeField] float m_detectionHeight = 3.0f;
     [Header("到達誤差範囲"), SerializeField] float m_errorRange = 0.1f;
     [Header("処理間隔時間"), SerializeField] public float m_processIntervalTime = 1.0f;
+    [Header("移動の制限時間"), SerializeField] float m_timeoutDuration = 10.0f;
 
     [Header("最短経由地点の座標差合計"), HideInInspector] float m_shortNodePosDis;
     [Header("一時経由地点の座標差合計"), HideInInspector] float m_tempNodePosDis;
@@ -23,6 +24,7 @@ public class Enemy : MonoBehaviour
     [Header("移動中の経由地点"), HideInInspector] Node m_currentNode;
     [Header("移動中の経由地点座標"), HideInInspector] Vector3 m_currentDis;
     [Header("経由地点到達フラグ"), HideInInspector] bool m_arriveNode = false;
+    [Header("制限時間用タイマー"), HideInInspector] float m_timeoutTimer = 0f;
 
 
     void Start()
@@ -189,23 +191,31 @@ public class Enemy : MonoBehaviour
     {
         if (m_currentTempNodeIndex < m_shortNodeObjList.Count)
         {
+            Rigidbody rb = GetComponent<Rigidbody>();
+
+            m_timeoutTimer += Time.deltaTime;
+
             //現在の経由地点に到達するまで、経由地点を更新しない
             if (!m_arriveNode)
             {
                 //現在の移動先経由地点と移動方向を取得する
                 m_currentNode = m_shortNodeObjList[m_currentTempNodeIndex];
-                m_currentDis = (m_currentNode.transform.position - transform.position).normalized;
+                Vector3 targetDirection = (m_currentNode.transform.position - transform.position).normalized;
+                rb.velocity = new Vector3(targetDirection.x * m_moveSpeed, rb.velocity.y, targetDirection.z * m_moveSpeed);
+
                 m_arriveNode = true;
+                m_timeoutTimer = 0f;
             }
 
-            //現在の移動先経由地点に移動する
-            transform.Translate(m_currentDis * m_moveSpeed * Time.deltaTime);
-
-            //現在の経由地点に到達した場合、次の移動先経由地点を設定
-            if (Vector3.Distance(transform.position, m_currentNode.transform.position) < m_errorRange)
+            // 現在の経由地点に到達した、且つ、制限時間を超過した場合、次の移動先経由地点を設定
+            if (Vector3.Distance(transform.position, m_currentNode.transform.position) < m_errorRange || m_timeoutTimer > m_timeoutDuration)
             {
-                m_arriveNode = false;
+                //移動を停止
+                rb.velocity = Vector3.zero;
                 m_currentTempNodeIndex++;
+
+                m_arriveNode = false;
+                m_timeoutTimer = 0f;
             }
         }
     }
