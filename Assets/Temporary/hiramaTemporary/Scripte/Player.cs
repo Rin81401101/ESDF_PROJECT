@@ -86,12 +86,20 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        // "WASD"の入力を取得する
+        //"WASD"で前後左右、"RF"で上下に移動
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
+        float verticalMovement = 0f;
 
-        // 入力値から移動ベクトルを作成し、移動する
-        Vector3 move = new Vector3(horizontalInput, 0f, verticalInput) * m_moveSpeed * Time.deltaTime;
+        if (Input.GetKey(KeyCode.R))
+        {
+            verticalMovement = 1f;
+        }
+        else if (Input.GetKey(KeyCode.F))
+        {
+            verticalMovement = -1f;
+        }
+        Vector3 move = new Vector3(horizontalInput, verticalMovement, verticalInput) * m_moveSpeed * Time.deltaTime;
         transform.Translate(move);
     }
 }

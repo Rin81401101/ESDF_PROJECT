@@ -12,8 +12,9 @@ public class Enemy : MonoBehaviour
     [Header("目標地点"), SerializeField] Transform m_playerTransform;
     [Header("親の経由地点情報"), SerializeField] GameObject m_masterNodeObj;
     [Header("移動速度"), SerializeField] float m_moveSpeed = 3.0f;
-    [Header("プレイヤーの探知範囲"), SerializeField] float detectionRange = 100.0f;
-    [Header("距離の誤差範囲"), SerializeField] float m_errorRange = 0.1f;
+    [Header("探索範囲"), SerializeField] float m_detectionRange = 50.0f;
+    [Header("探索高度"), SerializeField] float m_detectionHeight = 5.0f;
+    [Header("到達誤差範囲"), SerializeField] float m_errorRange = 0.1f;
     [Header("処理間隔時間"), SerializeField] public float m_processIntervalTime = 1.0f;
 
     [Header("最短経由地点の座標差合計"), HideInInspector] float m_shortNodePosDis;
@@ -61,16 +62,20 @@ public class Enemy : MonoBehaviour
         float firstNodePosDisMin = 0;   //経由地点の最短座標間距離
         int firstNodeNumMin = 0;        //経由地点の最短距離の要素番号
 
-        if (Physics.Raycast(transform.position, (m_playerTransform.position - transform.position), out RaycastHit hit, detectionRange))
+        Vector3 rayDirection = m_playerTransform.position - transform.position;
+
+        if (Physics.Raycast(transform.position, rayDirection, out RaycastHit hit, m_detectionRange))
         {
-            //プレイヤーを視認した場合、
-            if (hit.collider.CompareTag("Player"))
+            //プレイヤーを視認、且つ、一定の高度(Y軸)内で視認した場合、
+            float heightDis = Mathf.Abs(m_playerTransform.position.y - transform.position.y);
+
+            if (hit.collider.CompareTag("Player") && heightDis <= m_detectionHeight)
             {
                 //プレイヤーから最も近い経由地点を取得
                 GameObject playerNodeObj = GameObject.FindWithTag("Player");
                 firstNodeObj = playerNodeObj.GetComponent<Player>().m_playerNodeObj;
 
-                //Debug.Log("プレイヤー判定");
+                Debug.Log("プレイヤー判定");
             }
             //プレイヤーを視認できなかった場合、
             else
@@ -106,7 +111,7 @@ public class Enemy : MonoBehaviour
                 //自身から最も近い経由地点を取得
                 firstNodeObj = m_firstNodePosList[firstNodeNumMin].nodeObj.GetComponent<Node>();
 
-                //Debug.Log("障害物判定");
+                Debug.Log("障害物判定");
             }
         }
 
@@ -215,7 +220,7 @@ public class Enemy : MonoBehaviour
 
         Vector3 rayStart = transform.position;
         Vector3 rayDirection = (m_playerTransform.position - transform.position).normalized;
-        Gizmos.DrawRay(rayStart, rayDirection * detectionRange);
+        Gizmos.DrawRay(rayStart, rayDirection * m_detectionRange);
     }
     #endregion
 }
