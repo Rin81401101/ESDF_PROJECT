@@ -99,7 +99,9 @@ public class Player : MonoBehaviour
         {
             verticalMovement = -1f;
         }
-        Vector3 move = new Vector3(horizontalInput, verticalMovement, verticalInput) * m_moveSpeed * Time.deltaTime;
-        transform.Translate(move);
+
+        Vector3 move = new Vector3(horizontalInput, verticalMovement, verticalInput).normalized;
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.velocity = new Vector3(move.x * m_moveSpeed, rb.velocity.y, move.z * m_moveSpeed);
     }
 }
