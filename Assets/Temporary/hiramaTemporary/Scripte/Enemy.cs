@@ -41,7 +41,7 @@ public class Enemy : MonoBehaviour
             Node nodeObject = GetFirstPos();  //初回地点取得
             GetShortestRoute(nodeObject);     //最短経路ルート取得
 
-            //Debug.Log("最短経路：" + string.Join(", ", m_shortNodeObjList) + m_shortNodePosDis);
+            Debug.Log("最短経路：" + string.Join(", ", m_shortNodeObjList) + m_shortNodePosDis);
 
             yield return new WaitForSeconds(m_processIntervalTime);
         }
@@ -77,7 +77,7 @@ public class Enemy : MonoBehaviour
                 GameObject playerNodeObj = GameObject.FindWithTag("Player");
                 firstNodeObj = playerNodeObj.GetComponent<Player>().m_playerNodeObj;
 
-                Debug.Log("プレイヤー判定");
+                //Debug.Log("プレイヤー判定");
             }
             //プレイヤーを視認できなかった場合、
             else
@@ -113,7 +113,7 @@ public class Enemy : MonoBehaviour
                 //自身から最も近い経由地点を取得
                 firstNodeObj = m_firstNodePosList[firstNodeNumMin].nodeObj.GetComponent<Node>();
 
-                Debug.Log("障害物判定");
+                //Debug.Log("障害物判定");
             }
         }
 
@@ -138,6 +138,16 @@ public class Enemy : MonoBehaviour
                 m_tempNodePosDis += (Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis));
             }
 
+            //既に最短経路の座標差合計以上の場合、
+            if (m_shortNodeObjList.Count != 0 && m_shortNodePosDis < m_tempNodePosDis)
+            {
+                //一時リストに格納した座標情報を削除、次の経由地点処理に遷移する
+                m_tempNodeObjList.Remove(nextNodeObj);
+                m_tempNodePosDis -= Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis);
+
+                continue;
+            }
+
             //プレイヤーの最寄経由地点まで格納した場合、
             if (nextNodeObj.m_isPlayer)
             {
@@ -155,7 +165,7 @@ public class Enemy : MonoBehaviour
                     m_shortNodePosDis = m_tempNodePosDis;
                 }
 
-                //Debug.Log("経路一覧：" + string.Join(", ", tempNodeObjList) + tempNodePosDis);
+                Debug.Log("経路一覧：" + string.Join(", ", m_tempNodeObjList) + m_tempNodePosDis);
 
                 //プレイヤーの最寄経由地点データを削除する
                 m_tempNodeObjList.Remove(nextNodeObj);
@@ -173,7 +183,7 @@ public class Enemy : MonoBehaviour
                 GetShortestRoute(tempNodeObj);
             }
 
-            //探索済み、または、他の行先経由地点の再読込のため、削除する
+            //探索済み、他の行先経由地点の再読込のため、削除する
             m_tempNodeObjList.Remove(nextNodeObj);
             m_tempNodePosDis -= Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis);
         }
