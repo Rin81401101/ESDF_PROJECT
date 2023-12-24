@@ -13,13 +13,20 @@ public class Node : MonoBehaviour
 
     [Header("次の行先経由地点"), SerializeField] public List<Node> m_nextNodeObjList = new List<Node>();
 
-    [Header("プレイヤーの最寄経由地点"),HideInInspector] public bool m_isPlayer;
+    [Header("プレイヤーの最寄経由地点"), HideInInspector] public bool m_isPlayer;
 
 
-    void Reset()
+    void OnValidate()
     {
-        //経由地点情報リスト生成時、空の要素を生成する
-        m_nextNodeObjList.Add(null);
+        //次の行先経由地点が入力された場合、相互設定を行う
+        for (int i = 0; i < m_nextNodeObjList.Count; i++)
+        {
+            Node nextNode = m_nextNodeObjList[i];
+            if (nextNode != null && !nextNode.m_nextNodeObjList.Contains(this))
+            {
+                nextNode.m_nextNodeObjList.Add(this);
+            }
+        }
     }
 
 
