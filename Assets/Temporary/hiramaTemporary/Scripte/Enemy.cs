@@ -25,6 +25,7 @@ public class Enemy : MonoBehaviour
     [Header("移動中の経由地点座標"), HideInInspector] Vector3 m_currentDis;
     [Header("経由地点到達フラグ"), HideInInspector] bool m_arriveNode = false;
     [Header("制限時間用タイマー"), HideInInspector] float m_timeoutTimer = 0f;
+    [Header("経由地点の探知角度"), HideInInspector] float m_enemyVisio = 180f;
 
 
     void Start()
@@ -138,14 +139,24 @@ public class Enemy : MonoBehaviour
                 m_tempNodePosDis += (Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis));
             }
 
-            //既に最短経路の座標差合計以上の場合、
-            if (m_shortNodeObjList.Count != 0 && m_shortNodePosDis < m_tempNodePosDis)
+            //初回移行の場合(最適化処理)、
+            if (m_shortNodeObjList.Count != 0)
             {
-                //一時リストに格納した座標情報を削除、次の経由地点処理に遷移する
-                m_tempNodeObjList.Remove(nextNodeObj);
-                m_tempNodePosDis -= Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis);
+                //エネミーから見た目標地点と経由地点のベクトルを取得し、二点の内積和を取得する(Y座標は無視)
+                Vector3 toPlayer = (m_playerTransform.position - transform.position).normalized; toPlayer.y = 0;
+                Vector3 toNode = (nextNodeObj.transform.position - transform.position).normalized; toNode.y = 0;
+                float dot = Vector3.Dot(toNode, toPlayer);
 
-                continue;
+                //既に最短経路の座標差合計以上、また、対象の経由地点がエネミーの反対方向だった場合、
+                if (m_shortNodePosDis < m_tempNodePosDis || dot < Mathf.Cos(Mathf.Deg2Rad * (m_enemyVisio / 2f)))
+                //if (m_shortNodePosDis < m_tempNodePosDis)
+                {
+                    //一時リストに格納した座標情報を削除、次の経由地点処理に遷移する
+                    m_tempNodeObjList.Remove(nextNodeObj);
+                    m_tempNodePosDis -= Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis);
+
+                    continue;
+                }
             }
 
             //プレイヤーの最寄経由地点まで格納した場合、
@@ -193,7 +204,7 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        MoveShortestRoute();    //最短経路移動処理
+        //MoveShortestRoute();    //最短経路移動処理
     }
 
     #region 最短経路移動処理
