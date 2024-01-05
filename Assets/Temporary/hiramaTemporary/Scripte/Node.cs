@@ -7,8 +7,8 @@ public class Node : MonoBehaviour
 {
     public class NodePos    //経由地点クラス
     {
-        public GameObject nodeObj;    //各経由地点情報
-        public float nodePosDis;      //各経由地点の座標間距離
+        public GameObject m_nodeObj;    //各経由地点情報
+        public float m_nodePosDis;      //各経由地点の座標間距離
     }
 
     [Header("次の行先経由地点"), SerializeField] public List<Node> m_nextNodeObjList = new List<Node>();

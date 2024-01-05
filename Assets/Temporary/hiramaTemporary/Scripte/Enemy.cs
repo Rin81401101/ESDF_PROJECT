@@ -89,21 +89,21 @@ public class Enemy : MonoBehaviour
                     Node.NodePos tempNodePos = new Node.NodePos();
 
                     //各経由地点情報と座標間距離を取得
-                    tempNodePos.nodeObj = m_masterNodeObj.gameObject.transform.GetChild(i).gameObject;
+                    tempNodePos.m_nodeObj = m_masterNodeObj.gameObject.transform.GetChild(i).gameObject;
 
-                    Vector3 tempNodePosDis = tempNodePos.nodeObj.gameObject.transform.position;
-                    tempNodePos.nodePosDis = (Vector3.Distance(transform.position, tempNodePosDis));
+                    Vector3 tempNodePosDis = tempNodePos.m_nodeObj.gameObject.transform.position;
+                    tempNodePos.m_nodePosDis = (Vector3.Distance(transform.position, tempNodePosDis));
 
                     //初回は必ず保持
                     if (i == 0)
                     {
-                        firstNodePosDisMin = tempNodePos.nodePosDis;
+                        firstNodePosDisMin = tempNodePos.m_nodePosDis;
                         firstNodeNumMin = i;
                     }
                     //以降は座標間距離を比較、距離が短い方に更新
-                    else if (firstNodePosDisMin > tempNodePos.nodePosDis)
+                    else if (firstNodePosDisMin > tempNodePos.m_nodePosDis)
                     {
-                        firstNodePosDisMin = tempNodePos.nodePosDis;
+                        firstNodePosDisMin = tempNodePos.m_nodePosDis;
                         firstNodeNumMin = i;
                     }
 
@@ -112,7 +112,7 @@ public class Enemy : MonoBehaviour
                 }
 
                 //自身から最も近い経由地点を取得
-                firstNodeObj = m_firstNodePosList[firstNodeNumMin].nodeObj.GetComponent<Node>();
+                firstNodeObj = m_firstNodePosList[firstNodeNumMin].m_nodeObj.GetComponent<Node>();
 
                 //Debug.Log("障害物判定");
             }
@@ -139,24 +139,14 @@ public class Enemy : MonoBehaviour
                 m_tempNodePosDis += (Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis));
             }
 
-            //初回移行の場合(最適化処理)、
-            if (m_shortNodeObjList.Count != 0)
+            //初回移行(最適化処理)、また、既に最短経路の座標差合計以上の場合、
+            if (m_shortNodeObjList.Count != 0 && m_shortNodePosDis < m_tempNodePosDis)
             {
-                //エネミーから見た目標地点と経由地点のベクトルを取得し、二点の内積和を取得する(Y座標は無視)
-                Vector3 toPlayer = (m_playerTransform.position - transform.position).normalized; toPlayer.y = 0;
-                Vector3 toNode = (nextNodeObj.transform.position - transform.position).normalized; toNode.y = 0;
-                float dot = Vector3.Dot(toNode, toPlayer);
+                //一時リストに格納した座標情報を削除、次の経由地点処理に遷移する
+                m_tempNodeObjList.Remove(nextNodeObj);
+                m_tempNodePosDis -= Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis);
 
-                //既に最短経路の座標差合計以上、また、対象の経由地点がエネミーの反対方向だった場合、
-                if (m_shortNodePosDis < m_tempNodePosDis || dot < Mathf.Cos(Mathf.Deg2Rad * (m_enemyVisio / 2f)))
-                //if (m_shortNodePosDis < m_tempNodePosDis)
-                {
-                    //一時リストに格納した座標情報を削除、次の経由地点処理に遷移する
-                    m_tempNodeObjList.Remove(nextNodeObj);
-                    m_tempNodePosDis -= Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis);
-
-                    continue;
-                }
+                continue;
             }
 
             //プレイヤーの最寄経由地点まで格納した場合、

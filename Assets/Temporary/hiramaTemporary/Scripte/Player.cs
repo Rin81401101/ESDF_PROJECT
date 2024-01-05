@@ -41,23 +41,23 @@ public class Player : MonoBehaviour
                 Node.NodePos tempNodePos = new Node.NodePos();
 
                 //各経由地点情報と座標間距離取得
-                tempNodePos.nodeObj = m_masterNodeObj.gameObject.transform.GetChild(i).gameObject;
+                tempNodePos.m_nodeObj = m_masterNodeObj.gameObject.transform.GetChild(i).gameObject;
 
-                Vector3 tempNodePosDis = tempNodePos.nodeObj.gameObject.transform.position;
-                tempNodePos.nodePosDis = (Vector3.Distance(transform.position, tempNodePosDis));
+                Vector3 tempNodePosDis = tempNodePos.m_nodeObj.gameObject.transform.position;
+                tempNodePos.m_nodePosDis = (Vector3.Distance(transform.position, tempNodePosDis));
 
                 //初回は必ず保持
                 if (i == 0)
                 {
-                    playerNodePosDisMin = tempNodePos.nodePosDis;
+                    playerNodePosDisMin = tempNodePos.m_nodePosDis;
                     playerNodeNumMin = i;
                 }
                 //以降は座標間距離を比較、距離が短い方に更新
                 else
                 {
-                    if (playerNodePosDisMin > tempNodePos.nodePosDis)
+                    if (playerNodePosDisMin > tempNodePos.m_nodePosDis)
                     {
-                        playerNodePosDisMin = tempNodePos.nodePosDis;
+                        playerNodePosDisMin = tempNodePos.m_nodePosDis;
                         playerNodeNumMin = i;
                     }
                 }
@@ -67,7 +67,7 @@ public class Player : MonoBehaviour
             }
 
             //目標地点から最も近い経由地点を取得
-            m_playerNodeObj = m_playerNodePosList[playerNodeNumMin].nodeObj.GetComponent<Node>();
+            m_playerNodeObj = m_playerNodePosList[playerNodeNumMin].m_nodeObj.GetComponent<Node>();
 
             //プレイヤーの最寄経由地点を立てる
             if (m_playerNodeObj != null)
