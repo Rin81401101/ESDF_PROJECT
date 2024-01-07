@@ -6,11 +6,13 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     List<Node.NodePos> m_firstNodePosList = new List<Node.NodePos>();    //初回の経由地点リスト
-    List<Node> m_shortNodeObjList = new List<Node>(); //最短経由地点ルートリスト
-    List<Node> m_tempNodeObjList = new List<Node>();  //一時経由地点ルートリスト
+    List<Node> m_shortNodeObjList = new List<Node>();   //最短経由地点ルートリスト
+    List<Node> m_searchNodeObjList = new List<Node>();  //検索対象経由地点ルートリスト
+    List<Node> m_tempNodeObjList = new List<Node>();    //一時経由地点ルートリスト
 
     [Header("目標地点"), SerializeField] Transform m_playerTransform;
     [Header("親の経由地点情報"), SerializeField] GameObject m_masterNodeObj;
+    [Header("ステージ情報"), SerializeField] GameObject m_stageObj;
     [Header("移動速度"), SerializeField] float m_moveSpeed = 3.0f;
     [Header("探索範囲"), SerializeField] float m_detectionRange = 50.0f;
     [Header("探索高度"), SerializeField] float m_detectionHeight = 3.0f;
@@ -18,14 +20,13 @@ public class Enemy : MonoBehaviour
     [Header("処理間隔時間"), SerializeField] public float m_processIntervalTime = 1.0f;
     [Header("移動の制限時間"), SerializeField] float m_timeoutDuration = 10.0f;
 
+    [Header("前回のエネミー最寄経由地点"), HideInInspector] public Node m_lastEnemyNode = null;
     [Header("最短経由地点の座標差合計"), HideInInspector] float m_shortNodePosDis;
     [Header("一時経由地点の座標差合計"), HideInInspector] float m_tempNodePosDis;
     [Header("移動予定の経由地点番号"), HideInInspector] int m_currentTempNodeIndex;
     [Header("移動中の経由地点"), HideInInspector] Node m_currentNode;
-    [Header("移動中の経由地点座標"), HideInInspector] Vector3 m_currentDis;
     [Header("経由地点到達フラグ"), HideInInspector] bool m_arriveNode = false;
     [Header("制限時間用タイマー"), HideInInspector] float m_timeoutTimer = 0f;
-    [Header("経由地点の探知角度"), HideInInspector] float m_enemyVisio = 180f;
 
 
     void Start()
@@ -40,9 +41,10 @@ public class Enemy : MonoBehaviour
         {
             ClearShortestRoute();             //前回最短経路初期化
             Node nodeObject = GetFirstPos();  //初回地点取得
+            GetAreaNodeList();                //対象経由地点リスト取得
             GetShortestRoute(nodeObject);     //最短経路ルート取得
 
-            Debug.Log("最短経路：" + string.Join(", ", m_shortNodeObjList) + m_shortNodePosDis);
+            //Debug.Log("最短経路ルート：" + string.Join(", ", m_shortNodeObjList) + m_shortNodePosDis);
 
             yield return new WaitForSeconds(m_processIntervalTime);
         }
@@ -52,6 +54,7 @@ public class Enemy : MonoBehaviour
     #region 前回最短経路初期化
     void ClearShortestRoute()
     {
+        m_searchNodeObjList.Clear();
         m_shortNodeObjList.Clear();
         m_shortNodePosDis = 0f;
         m_currentTempNodeIndex = 0;
@@ -61,6 +64,12 @@ public class Enemy : MonoBehaviour
     #region 初回地点取得
     Node GetFirstPos()
     {
+        //前回の最寄経由地点を戻す
+        if (m_lastEnemyNode != null)
+        {
+            m_lastEnemyNode.m_isEnemy = false;
+        }
+
         Node firstNodeObj = null;       //経由地点情報
         float firstNodePosDisMin = 0;   //経由地点の最短座標間距離
         int firstNodeNumMin = 0;        //経由地点の最短距離の要素番号
@@ -120,7 +129,42 @@ public class Enemy : MonoBehaviour
 
         //Debug.Log("エネミー最寄経由地点：" + firstNodeObj);
 
+        //エネミーの最寄経由地点を立てる
+        if (firstNodeObj != null)
+        {
+            firstNodeObj.m_isEnemy = true;
+            m_lastEnemyNode = firstNodeObj;
+        }
+
         return firstNodeObj;
+    }
+    #endregion
+
+    #region 対象経由地点リスト取得
+    void GetAreaNodeList()
+    {
+        //分割した各エリアの経由地点リストを取得
+        List<Node>[] tempAreaNodeList = m_stageObj.GetComponent<Plane>().m_areaNodeList;
+
+        //各エリアの経由地点リスト数分、繰り返す
+        for (int i = 0; i < tempAreaNodeList.Length; i++)
+        {
+            //経由地点数分、繰り返す
+            for (int ii = 0; ii < tempAreaNodeList[i].Count; ii++)
+            {
+                Node tempNode = tempAreaNodeList[i][ii];
+
+                //最寄経由地点を判定した場合、検索対象の経由地点リストを格納
+                if (tempNode.m_isPlayer || tempNode.m_isEnemy)
+                {
+                    m_searchNodeObjList.AddRange(tempAreaNodeList[i]);
+                    Debug.Log($"対象検索エリア：エリア{i + 1}");
+                    break;
+                }
+            }
+        }
+
+        Debug.Log("検索経路地点一覧：" + string.Join(", ", m_searchNodeObjList));
     }
     #endregion
 
@@ -166,7 +210,7 @@ public class Enemy : MonoBehaviour
                     m_shortNodePosDis = m_tempNodePosDis;
                 }
 
-                Debug.Log("経路一覧：" + string.Join(", ", m_tempNodeObjList) + m_tempNodePosDis);
+                //Debug.Log("経路ルート一覧：" + string.Join(", ", m_tempNodeObjList) + m_tempNodePosDis);
 
                 //プレイヤーの最寄経由地点データを削除する
                 m_tempNodeObjList.Remove(nextNodeObj);

@@ -14,6 +14,7 @@ public class Node : MonoBehaviour
     [Header("次の行先経由地点"), SerializeField] public List<Node> m_nextNodeObjList = new List<Node>();
 
     [Header("プレイヤーの最寄経由地点"), HideInInspector] public bool m_isPlayer;
+    [Header("エネミーの最寄経由地点"), HideInInspector] public bool m_isEnemy;
 
 
     void OnValidate()

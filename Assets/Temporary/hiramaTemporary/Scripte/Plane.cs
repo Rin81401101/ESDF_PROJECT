@@ -10,7 +10,18 @@ public class Plane : MonoBehaviour
     [Header("各エリアの経由地点"), HideInInspector] public List<Node>[] m_areaNodeList;
 
 
-    void Start()
+    void Awake()
+    {
+        DivStageIntoArea();     //ステージ分割処理
+
+        for (int i = 0; i < m_areaNodeList.Length; i++)
+        {
+            Debug.Log($"エリア{i + 1}経由地点一覧: {string.Join(", ", m_areaNodeList[i].Select(node => node.gameObject.name))}");
+        }
+    }
+
+    #region ステージ分割処理
+    void DivStageIntoArea()
     {
         //ステージの中心座標とサイズを取得
         Vector3 stageCenter = this.transform.position;
@@ -36,13 +47,14 @@ public class Plane : MonoBehaviour
                 float areaCenter_X = stageCenter.x - (stageSize.x / 2) + (areaSize_X / 2) + i * areaSize_X;
                 float areaCenter_Z = stageCenter.z - (stageSize.z / 2) + (areaSize_Z / 2) + ii * areaSize_Z;
 
-                //エリア内のノードを取得
+                //エリア内ノード取得
                 GetAreaNodes(areaCenter_X, areaCenter_Z, areaSize_X, areaSize_Z, i, ii);
             }
         }
-
     }
+    #endregion
 
+    #region エリア内ノード取得
     void GetAreaNodes(float areaCenter_X, float areaCenter_Z, float areaSize_X, float areaSize_Z, int areaIndex_X, int areaIndex_Z)
     {
         GameObject[] tempNodeObjs = GameObject.FindGameObjectsWithTag("Node");
@@ -64,4 +76,5 @@ public class Plane : MonoBehaviour
             }
         }
     }
+    #endregion
 }
