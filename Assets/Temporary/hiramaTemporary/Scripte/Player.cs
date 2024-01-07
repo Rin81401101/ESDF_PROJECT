@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     [Header("前回のプレイヤー最寄経由地点"), HideInInspector] public Node m_lastPlayerNode = null;
 
 
-    void Awake()
+    void Start()
     {
         StartCoroutine(GetPlayerNode());    //目標経由地点探索処理
     }
@@ -25,13 +25,13 @@ public class Player : MonoBehaviour
     {
         while (true)
         {
-            //前回のプレイヤーの最寄経由地点を戻す
+            //前回の最寄経由地点を戻す
             if (m_lastPlayerNode != null)
             {
                 m_lastPlayerNode.m_isPlayer = false;
             }
 
-            m_playerNodeObj = null;           //経由地点情報
+            m_playerNodeObj = null;         //経由地点情報
             float playerNodePosDisMin = 0;  //経由地点の最短座標間距離
             int playerNodeNumMin = 0;       //経由地点の最短距離の要素番号
 
