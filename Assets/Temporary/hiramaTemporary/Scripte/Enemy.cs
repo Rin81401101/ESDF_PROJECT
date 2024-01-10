@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -7,7 +8,7 @@ public class Enemy : MonoBehaviour
 {
     List<Node.NodePos> m_firstNodePosList = new List<Node.NodePos>();    //初回の経由地点リスト
     List<Node> m_shortNodeObjList = new List<Node>();   //最短経由地点ルートリスト
-    List<Node> m_searchNodeObjList = new List<Node>();  //検索対象経由地点ルートリスト
+    List<Node> m_searchNodeObjList = new List<Node>();  //検索対象経由地点リスト
     List<Node> m_tempNodeObjList = new List<Node>();    //一時経由地点ルートリスト
 
     [Header("目標地点"), SerializeField] Transform m_playerTransform;
@@ -44,7 +45,7 @@ public class Enemy : MonoBehaviour
             GetAreaNodeList();                //対象経由地点リスト取得
             GetShortestRoute(nodeObject);     //最短経路ルート取得
 
-            //Debug.Log("最短経路ルート：" + string.Join(", ", m_shortNodeObjList) + m_shortNodePosDis);
+            Debug.Log("最短経路ルート：" + string.Join(", ", m_shortNodeObjList) + m_shortNodePosDis);
 
             yield return new WaitForSeconds(m_processIntervalTime);
         }
@@ -158,13 +159,13 @@ public class Enemy : MonoBehaviour
                 if (tempNode.m_isPlayer || tempNode.m_isEnemy)
                 {
                     m_searchNodeObjList.AddRange(tempAreaNodeList[i]);
-                    Debug.Log($"対象検索エリア：エリア{i + 1}");
+                    //Debug.Log($"対象検索エリア：エリア{i + 1}");
                     break;
                 }
             }
         }
 
-        Debug.Log("検索経路地点一覧：" + string.Join(", ", m_searchNodeObjList));
+        //Debug.Log("検索経路地点一覧：" + string.Join(", ", m_searchNodeObjList));
     }
     #endregion
 
@@ -183,8 +184,10 @@ public class Enemy : MonoBehaviour
                 m_tempNodePosDis += (Vector3.Distance(nextNodeObj.transform.position, nextNodePosDis));
             }
 
-            //初回移行(最適化処理)、また、既に最短経路の座標差合計以上の場合、
-            if (m_shortNodeObjList.Count != 0 && m_shortNodePosDis < m_tempNodePosDis)
+            //初回格納以降、且つ、前回座標差合計以上、または、処理中の経由地点が検索対象リストに無い場合、
+            if (m_shortNodeObjList.Count != 0 && (m_shortNodePosDis < m_tempNodePosDis ||
+                !m_searchNodeObjList.Contains(nextNodeObj)))
+            //if (m_shortNodeObjList.Count != 0 && m_shortNodePosDis < m_tempNodePosDis)
             {
                 //一時リストに格納した座標情報を削除、次の経由地点処理に遷移する
                 m_tempNodeObjList.Remove(nextNodeObj);
@@ -235,10 +238,9 @@ public class Enemy : MonoBehaviour
     }
     #endregion
 
-
     void Update()
     {
-        //MoveShortestRoute();    //最短経路移動処理
+        MoveShortestRoute();    //最短経路移動処理
     }
 
     #region 最短経路移動処理

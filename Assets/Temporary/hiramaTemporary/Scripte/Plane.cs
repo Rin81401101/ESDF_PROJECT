@@ -14,10 +14,10 @@ public class Plane : MonoBehaviour
     {
         DivStageIntoArea();     //ステージ分割処理
 
-        for (int i = 0; i < m_areaNodeList.Length; i++)
-        {
-            Debug.Log($"エリア{i + 1}経由地点一覧: {string.Join(", ", m_areaNodeList[i].Select(node => node.gameObject.name))}");
-        }
+        //for (int i = 0; i < m_areaNodeList.Length; i++)
+        //{
+        //    Debug.Log($"エリア{i + 1}経由地点一覧: {string.Join(", ", m_areaNodeList[i].Select(node => node.gameObject.name))}");
+        //}
     }
 
     #region ステージ分割処理
